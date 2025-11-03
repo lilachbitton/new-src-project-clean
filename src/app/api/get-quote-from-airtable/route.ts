@@ -1,0 +1,309 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
+const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
+
+// Table IDs
+const QUOTES_TABLE = 'tbl9d2UhyRrNVjGxW'; // הצעות מחיר ללקוח
+const OPTIONS_TABLE = 'tblkRYwCcYfEG6iAO'; // אופציות להצעת מחיר
+const OPPORTUNITIES_TABLE = 'tbl4fGlUM8KCbCS0R'; // הזדמנויות מכירה
+const PRODUCTS_TABLE = 'tbluPDR4eOtWC8D9J'; // מוצרים
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const quoteId = searchParams.get('quoteId');
+
+    console.log('🔍 Starting quote fetch:', { quoteId, hasApiKey: !!AIRTABLE_API_KEY, hasBaseId: !!AIRTABLE_BASE_ID });
+
+    if (!quoteId) {
+      return NextResponse.json(
+        { error: 'חסר quoteId' },
+        { status: 400 }
+      );
+    }
+
+    if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
+      console.error('❌ Missing Airtable credentials');
+      return NextResponse.json(
+        { error: 'חסרים נתוני התחברות לאיירטייבל' },
+        { status: 500 }
+      );
+    }
+
+    console.log('🔄 Fetching quote from Airtable...');
+
+    // 1. משוך את הצעת המחיר
+    const quoteResponse = await fetch(
+      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${QUOTES_TABLE}/${quoteId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${AIRTABLE_API_KEY}`,
+        },
+      }
+    );
+
+    if (!quoteResponse.ok) {
+      const errorText = await quoteResponse.text();
+      console.error('❌ Airtable API error:', quoteResponse.status, errorText);
+      throw new Error(`Failed to fetch quote: ${quoteResponse.status} ${errorText}`);
+    }
+
+    const quoteRecord = await quoteResponse.json();
+    const fields = quoteRecord.fields;
+
+    console.log('📄 Quote fetched successfully:', fields['מספר הצעה']);
+
+    // 2. משוך הזדמנות מכירה (אם יש)
+    let opportunityData = null;
+    if (fields['הזדמנויות מכירה'] && fields['הזדמנויות מכירה'].length > 0) {
+      try {
+        const opportunityId = fields['הזדמנויות מכירה'][0];
+        console.log('🎯 Fetching opportunity:', opportunityId);
+        
+        const opportunityResponse = await fetch(
+          `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${OPPORTUNITIES_TABLE}/${opportunityId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${AIRTABLE_API_KEY}`,
+            },
+          }
+        );
+
+        if (opportunityResponse.ok) {
+          const opportunityRecord = await opportunityResponse.json();
+          opportunityData = opportunityRecord.fields;
+          console.log('✅ Opportunity fetched');
+        }
+      } catch (error) {
+        console.warn('⚠️ Error fetching opportunity:', error);
+      }
+    }
+
+    // 3. משוך אופציות
+    let optionsData: any[] = [];
+    if (fields['אופציות להצעת מחיר 4'] && fields['אופציות להצעת מחיר 4'].length > 0) {
+      const optionIds = fields['אופציות להצעת מחיר 4'];
+      console.log(`📋 Fetching ${optionIds.length} options...`);
+      
+      try {
+        const optionsPromises = optionIds.map(async (optionId: string) => {
+          try {
+            const response = await fetch(
+              `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${OPTIONS_TABLE}/${optionId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${AIRTABLE_API_KEY}`,
+                },
+              }
+            );
+            if (response.ok) {
+              return await response.json();
+            }
+            return null;
+          } catch (error) {
+            console.warn(`⚠️ Error fetching option ${optionId}:`, error);
+            return null;
+          }
+        });
+
+        const optionsRecords = await Promise.all(optionsPromises);
+        optionsData = optionsRecords
+          .filter(record => record !== null)
+          .map(record => ({
+            id: record.id,
+            ...record.fields
+          }));
+        
+        console.log(`✅ Fetched ${optionsData.length} options successfully`);
+      } catch (error) {
+        console.error('❌ Error fetching options:', error);
+      }
+    }
+
+    // 4. בנה מבנה סופי
+    const quoteData = {
+      // מזהים
+      id: quoteRecord.id,
+      quoteNumber: fields['מספר הצעה'] || '',
+      
+      // פרטי לקוח
+      customerName: fields['שם לקוח'] || opportunityData?.['שם מלא'] || '',
+      customerEmail: opportunityData?.['Email'] || '',
+      customerPhone: fields['מספר טלפון איש קשר'] || opportunityData?.['טלפון'] || '',
+      customerCompany: opportunityData?.['שם חברה'] || '',
+      
+      // תאריכים
+      deliveryDate: fields['תאריך אספקה'] || opportunityData?.['תאריך אספקה מבוקש'] || '',
+      deliveryTime: opportunityData?.['שעת אספקה'] || '',
+      
+      // תקציב וכמויות
+      packageQuantity: fields['כמות מארזים'] || opportunityData?.['כמות מארזים'] || null,
+      budgetPerPackage: fields['תקציב למארז'] || opportunityData?.['תקציב'] || null,
+      budgetBeforeVAT: opportunityData?.['תקציב למארז לפני מע"מ'] || null,
+      budgetWithVAT: opportunityData?.['תקציב למארז כולל מעמ'] || null,
+      includeVAT: opportunityData?.['מחירים כולל מע"מ'] || false,
+      includeShipping: opportunityData?.['תקציב כולל משלוח'] || false,
+      
+      // רווחיות
+      profitTarget: 36,
+      agentCommission: (fields['עמלת סוכן'] || 0) * 100, // המרה ל-%
+      agent: fields['סוכן'] || opportunityData?.['סוכן'] || null,
+      
+      // פרטים נוספים
+      deliveryAddress: opportunityData?.['כתובת אספקה'] || '',
+      deliveryType: opportunityData?.['הפצה'] || '',
+      customerNotes: fields['איש קשר'] || opportunityData?.['דגשים מהלקוח'] || '',
+      customerPreferences: opportunityData?.['דגשים והעדפות'] || '',
+      celebration: opportunityData?.['מה חוגגים'] || '',
+      giftRecipients: opportunityData?.['מי מקבל את המתנות'] || '',
+      
+      // גלויות ומדבקות
+      customerCard: fields['גלוית לקוח'] || opportunityData?.['גלוית לקוח'] || '',
+      customerSticker: fields['מדבקת לקוח'] || opportunityData?.['מדבקת לקוח'] || '',
+      preferredPackaging: opportunityData?.['סוג אריזה מועדף'] || '',
+      
+      // סטטוס
+      status: fields['סטאטוס'] || '',
+      
+      // הזדמנות מכירה
+      opportunityId: fields['הזדמנויות מכירה']?.[0] || null,
+      occasion: opportunityData?.['מועד'] || [],
+      
+      // אופציות
+      options: await buildOptions(optionsData),
+    };
+
+    console.log('✅ Quote data built successfully');
+
+    return NextResponse.json(quoteData);
+
+  } catch (error: any) {
+    console.error('❌ Error in get-quote-from-airtable:', error);
+    return NextResponse.json(
+      { 
+        error: 'שגיאה במשיכת הצעת מחיר מהאיירטייבל',
+        details: error.message 
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// פונקציה לבניית אופציות
+async function buildOptions(optionsData: any[]) {
+  const options = [];
+
+  for (const option of optionsData) {
+    try {
+      let items: any[] = [];
+      
+      // מוצרים רגילים
+      if (option['מוצרים'] && option['מוצרים'].length > 0) {
+        const products = await fetchProducts(option['מוצרים'], 'product');
+        items = [...items, ...products];
+      }
+
+      // מוצרי אריזה
+      if (option['מוצרי אריזה ומיתוג copy'] && option['מוצרי אריזה ומיתוג copy'].length > 0) {
+        const packagingItems = await fetchProducts(option['מוצרי אריזה ומיתוג copy'], 'packaging');
+        items = [...items, ...packagingItems];
+      }
+
+      const optionData = {
+        id: option['Option Letter'] || option['מספר אופציה'] || 'A',
+        airtableId: option.id,
+        packageId: option['שם מארז']?.[0] || null, // ID של המארז
+        title: option['כותרת אופציה'] || `אופציה ${option['Option Letter'] || 'A'}`,
+        items,
+        
+        // חישובים - המרה חזרה לכולל מע"מ
+        total: (option['תמחור לפרויקט לפני מע"מ'] || 0) * 1.18,
+        productsCost: option['עלות מוצרים'] || 0,
+        packagingItemsCost: option['עלות מוצרי אריזה ומיתוג'] || 0,
+        packagingWorkCost: option['packaging work cost'] || 0,
+        additionalExpenses: option['הוצאות נוספות'] || 0,
+        actualProfit: option['רווח בפועל'] || 0,
+        actualProfitPercentage: option['רווח בפועל %'] || 0,
+        
+        // משלוח
+        shippingCost: option['תמחור משלוח ללקוח'] || 0,
+        includeShipping: option['משלוח'] === 'כן',
+        deliveryCompany: option['חברת משלוחים'] || '',
+        deliveryBoxesCount: option['כמות קרטונים להובלה'] ? parseInt(option['כמות קרטונים להובלה']) : null,
+        
+        // תמונה
+        image: option['תמונת מארז']?.[0]?.url || null,
+        
+        // סטטוס
+        status: option['סטאטוס'] || '',
+        internalStatus: option['סטטוס פנימי'] || '',
+        
+        // UI
+        isCollapsed: false,
+        isIrrelevant: false,
+      };
+
+      options.push(optionData);
+    } catch (error) {
+      console.warn(`⚠️ Error building option:`, error);
+    }
+  }
+
+  // אם אין אופציות, צור אופציה ריקה
+  if (options.length === 0) {
+    options.push({
+      id: 'A',
+      title: 'אופציה 1',
+      items: [],
+      total: 0,
+      isCollapsed: false,
+      isIrrelevant: false,
+    });
+  }
+
+  return options;
+}
+
+// פונקציה למשיכת מוצרים
+async function fetchProducts(productIds: string[], type: 'product' | 'packaging') {
+  if (!productIds || productIds.length === 0) return [];
+  
+  try {
+    const productsPromises = productIds.map(async (productId: string) => {
+      try {
+        const response = await fetch(
+          `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${PRODUCTS_TABLE}/${productId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${AIRTABLE_API_KEY}`,
+            },
+          }
+        );
+        
+        if (response.ok) {
+          const record = await response.json();
+          return {
+            id: record.id,
+            name: record.fields['מוצר'] || record.fields['שם מוצר'] || '',
+            details: record.fields['תיאור שיווקי'] || '',
+            price: record.fields['מחיר לפני מעמ'] || 0,
+            type,
+            productType: record.fields['סוג מוצר'] || '',
+            inventory: record.fields['current inventory'] || '',
+            boxesPerCarton: record.fields['כמות בקרטון'] || null,
+          };
+        }
+        return null;
+      } catch (error) {
+        return null;
+      }
+    });
+
+    const products = await Promise.all(productsPromises);
+    return products.filter(p => p !== null);
+  } catch (error) {
+    console.error('❌ Error fetching products:', error);
+    return [];
+  }
+}
