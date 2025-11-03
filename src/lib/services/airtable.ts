@@ -21,7 +21,7 @@ export async function fetchAllProducts(): Promise<Product[]> {
       .select()
       .all();
     
-    const products = records.map(record => {
+    const products = records.map((record: any) => {
       const fields = record.fields;
       return {
         id: record.id,
@@ -61,7 +61,7 @@ export async function fetchProductsByIds(productIds: string[]): Promise<Product[
       .select({ filterByFormula: formula })
       .all();
     
-    const products = records.map(record => {
+    const products = records.map((record: any) => {
       const fields = record.fields;
       return {
         id: record.id,
@@ -125,7 +125,7 @@ export async function fetchActivePackages(): Promise<Package[]> {
     }
     
     const packages = await Promise.all(
-      records.map(async record => {
+      records.map(async (record: any) => {
         const itemIds = (record.get('מוצרים') as string[]) || [];
         const packagingIds = (record.get('מוצרי מיתוג ואריזה') as string[]) || [];
         const parallelPackages = (record.get('מארז מקביל') as string[]) || [];
@@ -188,7 +188,7 @@ export async function fetchPackagesByCatalog(catalogId: string): Promise<Package
       .all();
     
     const packages = await Promise.all(
-      records.map(async record => {
+      records.map(async (record: any) => {
         const itemIds = (record.get('מוצרים') as string[]) || [];
         const packagingIds = (record.get('מוצרי מיתוג ואריזה') as string[]) || [];
         const parallelPackages = (record.get('מארז מקביל') as string[]) || [];
@@ -230,7 +230,7 @@ export async function fetchCatalogs(): Promise<Catalog[]> {
     
     const records = await base('קטלוגים').select().all();
     
-    const catalogs = records.map(record => ({
+    const catalogs = records.map((record: any) => ({
       id: record.id,
       name: record.get('שם הקטלוג') as string || 'קטלוג ללא שם',
     }));

@@ -19,7 +19,7 @@ export async function GET() {
       .select()
       .all();
     
-    const products = records.map(record => {
+    const products = records.map((record: any) => {
       const fields = record.fields;
       return {
         id: record.id,
