@@ -10,15 +10,9 @@ interface CustomerInfoProps {
 }
 
 export function CustomerInfo({ quoteData, onUpdate }: CustomerInfoProps) {
-  if (!quoteData) return null;
-
-  const updateField = (field: keyof QuoteData, value: any) => {
-    onUpdate({ ...quoteData, [field]: value });
-  };
-
   // חישוב מע"מ אוטומטי כש-budgetPerPackage משתנה
   useEffect(() => {
-    if (quoteData.budgetPerPackage && quoteData.budgetPerPackage > 0) {
+    if (quoteData && quoteData.budgetPerPackage && quoteData.budgetPerPackage > 0) {
       if (quoteData.includeVAT) {
         // אם כולל מע"מ - חשב לפני מע"מ
         const beforeVAT = Math.round((quoteData.budgetPerPackage / 1.18) * 100) / 100;
@@ -30,7 +24,13 @@ export function CustomerInfo({ quoteData, onUpdate }: CustomerInfoProps) {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quoteData.budgetPerPackage, quoteData.includeVAT]);
+  }, [quoteData?.budgetPerPackage, quoteData?.includeVAT]);
+
+  if (!quoteData) return null;
+
+  const updateField = (field: keyof QuoteData, value: any) => {
+    onUpdate({ ...quoteData, [field]: value });
+  };
 
   // המחיר המחושב להצגה
   const calculatedBudget = quoteData.includeVAT 
