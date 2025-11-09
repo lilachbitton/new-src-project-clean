@@ -128,14 +128,14 @@ export async function GET(request: NextRequest) {
       quoteNumber: fields['מספר הצעה'] || '',
       
       // פרטי לקוח
-      customerName: fields['שם לקוח'] || opportunityData?.['שם מלא'] || '',
-      customerEmail: opportunityData?.['Email'] || '',
-      customerPhone: fields['מספר טלפון איש קשר'] || opportunityData?.['טלפון'] || '',
-      customerCompany: opportunityData?.['שם חברה'] || '',
+      customerName: String(fields['שם לקוח'] || opportunityData?.['שם מלא'] || ''),
+      customerEmail: String(opportunityData?.['Email'] || ''),
+      customerPhone: String(fields['מספר טלפון איש קשר'] || opportunityData?.['טלפון'] || ''),
+      customerCompany: String(opportunityData?.['שם חברה'] || ''),
       
       // תאריכים
-      deliveryDate: fields['תאריך אספקה'] || opportunityData?.['תאריך אספקה מבוקש'] || '',
-      deliveryTime: opportunityData?.['שעת אספקה'] || '',
+      deliveryDate: String(fields['תאריך אספקה'] || opportunityData?.['תאריך אספקה מבוקש'] || ''),
+      deliveryTime: String(opportunityData?.['שעת אספקה'] || ''),
       
       // תקציב וכמויות
       packageQuantity: fields['כמות מארזים'] || opportunityData?.['כמות מארזים'] || null,
@@ -148,23 +148,23 @@ export async function GET(request: NextRequest) {
       // רווחיות
       profitTarget: 36,
       agentCommission: (fields['עמלת סוכן'] || 0) * 100, // המרה ל-%
-      agent: fields['סוכן'] || opportunityData?.['סוכן'] || null,
+      agent: (Array.isArray(fields['סוכן']) ? fields['סוכן'][0] : fields['סוכן']) || (Array.isArray(opportunityData?.['סוכן']) ? opportunityData['סוכן'][0] : opportunityData?.['סוכן']) || null,
       
       // פרטים נוספים
-      deliveryAddress: opportunityData?.['כתובת אספקה'] || '',
-      deliveryType: opportunityData?.['הפצה'] || '',
-      customerNotes: fields['איש קשר'] || opportunityData?.['דגשים מהלקוח'] || '',
-      customerPreferences: opportunityData?.['דגשים והעדפות'] || '',
-      celebration: opportunityData?.['מה חוגגים'] || '',
-      giftRecipients: opportunityData?.['מי מקבל את המתנות'] || '',
+      deliveryAddress: String(opportunityData?.['כתובת אספקה'] || ''),
+      deliveryType: String(opportunityData?.['הפצה'] || ''),
+      customerNotes: String(fields['איש קשר'] || opportunityData?.['דגשים מהלקוח'] || ''),
+      customerPreferences: String(opportunityData?.['דגשים והעדפות'] || ''),
+      celebration: String(opportunityData?.['מה חוגגים'] || ''),
+      giftRecipients: String(opportunityData?.['מי מקבל את המתנות'] || ''),
       
       // גלויות ומדבקות
-      customerCard: fields['גלוית לקוח'] || opportunityData?.['גלוית לקוח'] || '',
-      customerSticker: fields['מדבקת לקוח'] || opportunityData?.['מדבקת לקוח'] || '',
-      preferredPackaging: opportunityData?.['סוג אריזה מועדף'] || '',
+      customerCard: String(fields['גלוית לקוח'] || opportunityData?.['גלוית לקוח'] || ''),
+      customerSticker: String(fields['מדבקת לקוח'] || opportunityData?.['מדבקת לקוח'] || ''),
+      preferredPackaging: String(opportunityData?.['סוג אריזה מועדף'] || ''),
       
       // סטטוס
-      status: fields['סטאטוס'] || '',
+      status: String(fields['סטאטוס'] || ''),
       
       // הזדמנות מכירה
       opportunityId: fields['הזדמנויות מכירה']?.[0] || null,
@@ -190,6 +190,22 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// פונקציות עזר לניקוי ערכים מאיירטייבל
+function safeString(value: any): string {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) return value[0] || '';
+  if (typeof value === 'object') return '';
+  return String(value);
+}
+
+function safeValue(value: any, defaultVal: any = null): any {
+  if (value === null || value === undefined) return defaultVal;
+  if (typeof value === 'object' && !Array.isArray(value)) return defaultVal;
+  if (Array.isArray(value)) return value[0] || defaultVal;
+  return value;
+}
+
 // פונקציה לבניית אופציות
 async function buildOptions(optionsData: any[]) {
   const options = [];
@@ -211,16 +227,16 @@ async function buildOptions(optionsData: any[]) {
       }
 
       const optionData = {
-        id: option['Option Letter'] || option['מספר אופציה'] || 'A',
+        id: safeString(option['Option Letter'] || option['מספר אופציה'] || 'A'),
         airtableId: option.id,
-        packageId: option['שם מארז']?.[0] || null, // ID של המארז
-        title: option['כותרת אופציה'] || `אופציה ${option['Option Letter'] || 'A'}`,
+        packageId: safeValue(option['שם מארז']?.[0]),
+        title: safeString(option['כותרת אופציה'] || `אופציה ${option['Option Letter'] || 'A'}`),
         items,
         
         // חישובים - כל השדות מאיירטייבל
         total: (option['תמחור לפרויקט לפני מע"מ'] || 0) * 1.18,
         profitTarget: option['יעד רווחיות'] || null,
-        agent: option['סוכן'] || null,
+        agent: safeValue(option['סוכן']),
         agentCommission: option['עמלת סוכן %'] || null,
         costPrice: option['מחיר עלות'] || 0,
         additionalExpenses: option['הוצאות נוספות'] || 0,
@@ -236,8 +252,8 @@ async function buildOptions(optionsData: any[]) {
         actualProfit: option['רווח בפועל למארז'] || 0,
         
         // משלוח - 9 שדות
-        deliveryCompany: option['חברת משלוחים CLAUDE'] || '',
-        packaging: option['אריזה CLAUDE'] || '',
+        deliveryCompany: safeString(option['חברת משלוחים CLAUDE']),
+        packaging: safeString(option['אריזה CLAUDE']),
         unitsPerCarton: option['כמות שנכנסת בקרטון CLAUDE'] || null,
         deliveryBoxesCount: option['כמות קרטונים להובלה CLAUDE'] || null,
         projectPriceBeforeVAT: option['תמחור לפרויקט לפני מע"מ CLAUDE'] || 0,
@@ -251,8 +267,8 @@ async function buildOptions(optionsData: any[]) {
         image: option['תמונת מארז']?.[0]?.url || null,
         
         // סטטוס
-        status: option['סטאטוס'] || '',
-        internalStatus: option['סטטוס פנימי'] || '',
+        status: safeString(option['סטאטוס']),
+        internalStatus: safeString(option['סטטוס פנימי']),
         
         // UI
         isCollapsed: false,
