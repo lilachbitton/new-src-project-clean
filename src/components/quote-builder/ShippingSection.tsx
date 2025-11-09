@@ -41,16 +41,23 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
         ? Math.round(option.projectPriceBeforeVAT * 1.1 * 100) / 100
         : option.projectPriceBeforeVAT;
       
+      const updates: any = {};
+      let needsUpdate = false;
+      
       // עדכן את projectPriceToClientBeforeVAT
       if (Math.abs((option.projectPriceToClientBeforeVAT || 0) - calculated) > 0.01) {
-        onUpdate(option.id, { ...option, projectPriceToClientBeforeVAT: calculated });
+        updates.projectPriceToClientBeforeVAT = calculated;
+        needsUpdate = true;
       }
       
       // עדכן את shippingPriceToClient רק אם הוא ריק או 0
-      if (!option.shippingPriceToClient || option.shippingPriceToClient === 0) {
-        setTimeout(() => {
-          onUpdate(option.id, { ...option, shippingPriceToClient: calculated });
-        }, 50);
+      if ((!option.shippingPriceToClient || option.shippingPriceToClient === 0) && Math.abs((option.shippingPriceToClient || 0) - calculated) > 0.01) {
+        updates.shippingPriceToClient = calculated;
+        needsUpdate = true;
+      }
+      
+      if (needsUpdate) {
+        onUpdate(option.id, { ...option, ...updates });
       }
     }
   }, [option.projectPriceBeforeVAT]);
