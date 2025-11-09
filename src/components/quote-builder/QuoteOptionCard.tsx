@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { QuoteData, QuoteOption, Item } from '@/types';
+import { useOptionCalculations } from '@/hooks/useOptionCalculations';
 import { 
   ChevronDown, 
   Copy, 
@@ -36,6 +37,9 @@ export function QuoteOptionCard({
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [dragOverItem, setDragOverItem] = useState<string | null>(null);
   const [showRowActions, setShowRowActions] = useState<string | null>(null);
+
+  // שימוש ב-hook לחישובים אוטומטיים
+  useOptionCalculations(option, quoteData, onUpdate);
 
   const handleTitleChange = (title: string) => {
     onUpdate(option.id, { ...option, title });
@@ -542,33 +546,103 @@ export function QuoteOptionCard({
                   </div>
                 </div>
 
+                {/* שדות קלט - יעד רווחיות, סוכן, ועמלה */}
+                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                  <h4 className="text-sm font-bold text-yellow-700 mb-3">שדות קלט</h4>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">יעד רווחיות (%)</label>
+                      <Input
+                        type="number"
+                        value={option.profitTarget || quoteData.profitTarget || 36}
+                        onChange={(e) => onUpdate(option.id, { ...option, profitTarget: parseFloat(e.target.value) || 0 })}
+                        placeholder="36"
+                        className="text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">סוכן</label>
+                      <Input
+                        value={option.agent || quoteData.agent || ""}
+                        onChange={(e) => onUpdate(option.id, { ...option, agent: e.target.value })}
+                        placeholder="שם הסוכן"
+                        className="text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">עמלת סוכן (%)</label>
+                      <Input
+                        type="number"
+                        value={option.agentCommission || quoteData.agentCommission || 0}
+                        onChange={(e) => onUpdate(option.id, { ...option, agentCommission: parseFloat(e.target.value) || 0 })}
+                        placeholder="0"
+                        className="text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">הוצאות נוספות (₪)</label>
+                      <Input
+                        type="number"
+                        value={option.additionalExpenses || 0}
+                        onChange={(e) => onUpdate(option.id, { ...option, additionalExpenses: parseFloat(e.target.value) || 0 })}
+                        placeholder="0"
+                        className="text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">עלות עבודת אריזה (₪)</label>
+                      <Input
+                        type="number"
+                        value={option.packagingWorkCost || 0}
+                        onChange={(e) => onUpdate(option.id, { ...option, packagingWorkCost: parseFloat(e.target.value) || 0 })}
+                        placeholder="0"
+                        className="text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 {/* חישובים כספיים - תצוגה בלבד */}
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                   <h4 className="text-sm font-bold text-blue-700 mb-3">חישובים כספיים</h4>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                     <div className="flex justify-between py-1 border-b border-blue-100">
+                      <span className="text-gray-600">מחיר עלות:</span>
+                      <span className="font-semibold">₪{(option.costPrice || 0).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-blue-100">
+                      <span className="text-gray-600">עלות מוצרי אריזה ומיתוג:</span>
+                      <span className="font-semibold">₪{(option.packagingItemsCost || 0).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-blue-100">
                       <span className="text-gray-600">עלות מוצרים בפועל:</span>
                       <span className="font-semibold">₪{(option.productsCost || 0).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <span className="text-gray-600">עלות עבודת אריזה:</span>
-                      <span className="font-semibold">₪{(option.packagingWorkCost || 0).toFixed(2)}</span>
+                      <span className="text-gray-600">תקציב נותר למוצרים:</span>
+                      <span className="font-semibold">₪{(option.budgetRemainingForProducts || 0).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <span className="text-gray-600">הוצאות נוספות:</span>
-                      <span className="font-semibold">₪{(option.additionalExpenses || 0).toFixed(2)}</span>
+                      <span className="text-gray-600">כמות מוצרים:</span>
+                      <span className="font-semibold">{option.productQuantity || 0}</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <span className="text-gray-600">עלות מוצרי אריזה:</span>
-                      <span className="font-semibold">₪{(option.packagingItemsCost || 0).toFixed(2)}</span>
+                      <span className="text-gray-600">% רווח בפועל למארז:</span>
+                      <span className="font-semibold text-green-600">{(option.actualProfitPercentage || 0).toFixed(2)}%</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-green-100">
+                      <span className="text-gray-700 font-medium">רווח לעסקה בשקלים:</span>
+                      <span className="font-bold text-green-700">₪{(option.profitPerDeal || 0).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-green-100">
+                      <span className="text-gray-700 font-medium">סה"כ רווח לעסקה:</span>
+                      <span className="font-bold text-green-700">₪{(option.totalDealProfit || 0).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between py-1">
-                      <span className="text-gray-600 font-medium">רווח בפועל למארז:</span>
-                      <span className="font-bold text-green-600">₪{(option.actualProfit || 0).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between py-1">
-                      <span className="text-gray-600 font-medium">רווח בפועל %:</span>
-                      <span className="font-bold text-green-600">{(option.actualProfitPercentage || 0).toFixed(2)}%</span>
+                      <span className="text-gray-700 font-medium">הכנסה ללא מע"מ:</span>
+                      <span className="font-bold text-blue-700">₪{(option.revenueWithoutVAT || 0).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>

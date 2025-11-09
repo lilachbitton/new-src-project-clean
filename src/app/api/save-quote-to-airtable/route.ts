@@ -51,6 +51,23 @@ export async function POST(request: NextRequest) {
           'Option Letter': option.id,
           'מוצרים': option.items?.filter((i: any) => i.type === 'product' && isValidRecordId(i.id)).map((i: any) => i.id) || [],
           'מוצרי אריזה ומיתוג copy': option.items?.filter((i: any) => i.type === 'packaging' && isValidRecordId(i.id)).map((i: any) => i.id) || [],
+          
+          // שדות חישוביים
+          'יעד רווחיות': option.profitTarget,
+          'סוכן': option.agent,
+          'עמלת סוכן %': option.agentCommission,
+          'מחיר עלות': option.costPrice,
+          'הוצאות נוספות': option.additionalExpenses,
+          'עלות עבודת אריזה': option.packagingWorkCost,
+          'עלות מוצרי אריזה ומיתוג': option.packagingItemsCost,
+          'עלות מוצרים בפועל': option.productsCost,
+          'תקציב נותר למוצרים': option.budgetRemainingForProducts,
+          'כמות מוצרים': option.productQuantity,
+          '% רווח בפועל למארז': option.actualProfitPercentage,
+          'רווח לעסקה בשקלים': option.profitPerDeal,
+          'סה"כ רווח לעסקה': option.totalDealProfit,
+          'הכנסה ללא מע"מ': option.revenueWithoutVAT,
+          'רווח בפועל למארז': option.actualProfit,
         };
         if (option.packageId && isValidRecordId(option.packageId)) fields['שם מארז'] = [option.packageId];
         if (option.shippingCost !== undefined) fields['תמחור משלוח ללקוח'] = option.shippingCost;
@@ -78,6 +95,23 @@ export async function POST(request: NextRequest) {
           'Option Letter': option.id,
           'כותרת אופציה': option.title || `אופציה ${option.id}`,
           'שם לקוח': quoteData.customerName || '',
+          
+          // שדות חישוביים
+          'יעד רווחיות': option.profitTarget,
+          'סוכן': option.agent,
+          'עמלת סוכן %': option.agentCommission,
+          'מחיר עלות': option.costPrice,
+          'הוצאות נוספות': option.additionalExpenses,
+          'עלות עבודת אריזה': option.packagingWorkCost,
+          'עלות מוצרי אריזה ומיתוג': option.packagingItemsCost,
+          'עלות מוצרים בפועל': option.productsCost,
+          'תקציב נותר למוצרים': option.budgetRemainingForProducts,
+          'כמות מוצרים': option.productQuantity,
+          '% רווח בפועל למארז': option.actualProfitPercentage,
+          'רווח לעסקה בשקלים': option.profitPerDeal,
+          'סה"כ רווח לעסקה': option.totalDealProfit,
+          'הכנסה ללא מע"מ': option.revenueWithoutVAT,
+          'רווח בפועל למארז': option.actualProfit,
         };
         if (option.packageId && isValidRecordId(option.packageId)) fields['שם מארז'] = [option.packageId];
         const productIds = option.items?.filter((i: any) => i.type === 'product' && isValidRecordId(i.id)).map((i: any) => i.id) || [];

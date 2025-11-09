@@ -217,14 +217,23 @@ async function buildOptions(optionsData: any[]) {
         title: option['כותרת אופציה'] || `אופציה ${option['Option Letter'] || 'A'}`,
         items,
         
-        // חישובים - המרה חזרה לכולל מע"מ
+        // חישובים - כל השדות מאיירטייבל
         total: (option['תמחור לפרויקט לפני מע"מ'] || 0) * 1.18,
-        productsCost: option['עלות מוצרים'] || 0,
-        packagingItemsCost: option['עלות מוצרי אריזה ומיתוג'] || 0,
-        packagingWorkCost: option['packaging work cost'] || 0,
+        profitTarget: option['יעד רווחיות'] || null,
+        agent: option['סוכן'] || null,
+        agentCommission: option['עמלת סוכן %'] || null,
+        costPrice: option['מחיר עלות'] || 0,
         additionalExpenses: option['הוצאות נוספות'] || 0,
-        actualProfit: option['רווח בפועל'] || 0,
-        actualProfitPercentage: option['רווח בפועל %'] || 0,
+        packagingWorkCost: option['עלות עבודת אריזה'] || 0,
+        packagingItemsCost: option['עלות מוצרי אריזה ומיתוג'] || 0,
+        productsCost: option['עלות מוצרים בפועל'] || 0,
+        budgetRemainingForProducts: option['תקציב נותר למוצרים'] || 0,
+        productQuantity: option['כמות מוצרים'] || 0,
+        actualProfitPercentage: option['% רווח בפועל למארז'] || 0,
+        profitPerDeal: option['רווח לעסקה בשקלים'] || 0,
+        totalDealProfit: option['סה"כ רווח לעסקה'] || 0,
+        revenueWithoutVAT: option['הכנסה ללא מע"מ'] || 0,
+        actualProfit: option['רווח בפועל למארז'] || 0,
         
         // משלוח
         shippingCost: option['תמחור משלוח ללקוח'] || 0,

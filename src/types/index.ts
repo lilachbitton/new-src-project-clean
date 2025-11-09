@@ -23,12 +23,21 @@ export interface QuoteOption {
   image?: string | null;
   
   // Calculation fields
-  additionalExpenses?: number;
-  packagingWorkCost?: number;
-  productsCost?: number;
-  packagingItemsCost?: number;
-  actualProfit?: number;
-  actualProfitPercentage?: number;
+  profitTarget?: number; // יעד רווחיות
+  agent?: string; // סוכן
+  agentCommission?: number; // עמלת סוכן %
+  costPrice?: number; // מחיר עלות
+  additionalExpenses?: number; // הוצאות נוספות
+  packagingWorkCost?: number; // עלות עבודת אריזה
+  packagingItemsCost?: number; // עלות מוצרי אריזה ומיתוג
+  productsCost?: number; // עלות מוצרים בפועל
+  budgetRemainingForProducts?: number; // תקציב נותר למוצרים
+  productQuantity?: number; // כמות מוצרים
+  actualProfitPercentage?: number; // % רווח בפועל למארז
+  profitPerDeal?: number; // רווח לעסקה בשקלים
+  totalDealProfit?: number; // סה"כ רווח לעסקה
+  revenueWithoutVAT?: number; // הכנסה ללא מע"מ
+  actualProfit?: number; // רווח בפועל למארז (בשקלים)
   
   // Shipping fields
   shippingCost?: number;
