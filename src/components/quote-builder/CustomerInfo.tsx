@@ -10,21 +10,6 @@ interface CustomerInfoProps {
 }
 
 export function CustomerInfo({ quoteData, onUpdate }: CustomerInfoProps) {
-  // בדיקה בעת טעינה - אם תקציב כולל משלוח מסומן ואין עלות משלוח
-  useEffect(() => {
-    if (quoteData?.includeShipping && quoteData?.options) {
-      const hasOptionsWithoutShipping = quoteData.options.some(
-        opt => !opt.shippingPriceToClient || opt.shippingPriceToClient === 0
-      );
-      
-      if (hasOptionsWithoutShipping) {
-        setTimeout(() => {
-          alert('⚠️ שים לב!\n\nנבחרה האופציה "תקציב כולל משלוח" אך ישנן אופציות בהן לא הוזנה עלות משלוח ללקוח.\n\nיש להזין עלות משלוח בכל האופציות על מנת שהחישובים יהיו תקינים.');
-        }, 500);
-      }
-    }
-  }, [quoteData?.includeShipping, quoteData?.options]);
-
   // חישוב מע"מ אוטומטי כש-budgetPerPackage משתנה
   useEffect(() => {
     if (quoteData && quoteData.budgetPerPackage && quoteData.budgetPerPackage > 0) {

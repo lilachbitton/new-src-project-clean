@@ -36,18 +36,21 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
 
   // תמחור לפרויקט ללקוח לפני מע"מ
   useEffect(() => {
-    if (option.projectPriceBeforeVAT !== undefined) {
+    if (option.projectPriceBeforeVAT !== undefined && option.projectPriceBeforeVAT !== null) {
       const calculated = option.projectPriceBeforeVAT < 600 
-        ? option.projectPriceBeforeVAT * 1.1 
+        ? Math.round(option.projectPriceBeforeVAT * 1.1 * 100) / 100
         : option.projectPriceBeforeVAT;
       
-      if (option.projectPriceToClientBeforeVAT !== calculated) {
-        // עדכן גם את תמחור משלוח ללקוח אם הוא ריק
-        const updates: any = { ...option, projectPriceToClientBeforeVAT: calculated };
-        if (!option.shippingPriceToClient || option.shippingPriceToClient === 0) {
-          updates.shippingPriceToClient = calculated;
-        }
-        onUpdate(option.id, updates);
+      // עדכן את projectPriceToClientBeforeVAT
+      if (Math.abs((option.projectPriceToClientBeforeVAT || 0) - calculated) > 0.01) {
+        onUpdate(option.id, { ...option, projectPriceToClientBeforeVAT: calculated });
+      }
+      
+      // עדכן את shippingPriceToClient רק אם הוא ריק או 0
+      if (!option.shippingPriceToClient || option.shippingPriceToClient === 0) {
+        setTimeout(() => {
+          onUpdate(option.id, { ...option, shippingPriceToClient: calculated });
+        }, 50);
       }
     }
   }, [option.projectPriceBeforeVAT]);
