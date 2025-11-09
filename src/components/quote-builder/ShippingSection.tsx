@@ -130,11 +130,23 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
                       ? Math.round(newValue * 1.1 * 100) / 100
                       : newValue;
                     
-                    // עדכון מיידי - אם shippingPriceToClient ריק, מלא אותו בערך המחושב
+                    // חשב את הערך הצפוי על בסיס הערך הקודם
+                    const oldValue = option.projectPriceBeforeVAT || 0;
+                    const expectedOldCalculated = oldValue < 600 
+                      ? Math.round(oldValue * 1.1 * 100) / 100
+                      : oldValue;
+                    
+                    // עדכון מיידי:
+                    // - אם השדה ריק/אפס, מלא אותו
+                    // - אם השדה שווה לערך המחושב הקודם, עדכן אותו (כלומר המשתמש לא שינה אותו ידנית)
+                    const currentShipping = option.shippingPriceToClient || 0;
+                    const shouldUpdate = currentShipping === 0 || 
+                                       currentShipping === expectedOldCalculated;
+                    
                     onUpdate(option.id, { 
                       ...option, 
                       projectPriceBeforeVAT: newValue,
-                      shippingPriceToClient: (!option.shippingPriceToClient || option.shippingPriceToClient === 0) ? calculated : option.shippingPriceToClient
+                      shippingPriceToClient: shouldUpdate ? calculated : currentShipping
                     });
                   }}
                   placeholder="0.00"
