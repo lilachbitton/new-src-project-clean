@@ -12,7 +12,6 @@ interface ShippingSectionProps {
 
 export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [hasManuallyEditedShipping, setHasManuallyEditedShipping] = useState(false);
 
   const deliveryCompanies = [
     "משלוחים אקספרס",
@@ -35,7 +34,7 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
     }
   }, [option.projectPriceBeforeVAT]);
 
-  // תמחור לפרויקט ללקוח לפני מע"מ
+  // תמחור לפרויקט ללקוח לפני מע"מ ותמחור משלוח ללקוח
   useEffect(() => {
     if (option.projectPriceBeforeVAT !== undefined && option.projectPriceBeforeVAT !== null) {
       const calculated = option.projectPriceBeforeVAT < 600 
@@ -43,25 +42,28 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
         : option.projectPriceBeforeVAT;
       
       const updates: any = {};
-      let needsUpdate = false;
       
-      // עדכן את projectPriceToClientBeforeVAT
+      // עדכן projectPriceToClientBeforeVAT
       if (Math.abs((option.projectPriceToClientBeforeVAT || 0) - calculated) > 0.01) {
         updates.projectPriceToClientBeforeVAT = calculated;
-        needsUpdate = true;
       }
       
-      // עדכן את shippingPriceToClient רק אם לא ערכו ידנית
-      if (!hasManuallyEditedShipping && (!option.shippingPriceToClient || Math.abs(option.shippingPriceToClient - calculated) > 0.01)) {
+      // עדכן shippingPriceToClient רק אם הוא ריק או שווה לחישוב הקודם (לא עורך ידנית)
+      const prevCalculated = option.projectPriceBeforeVAT < 600 
+        ? Math.round((option.projectPriceBeforeVAT / 1.1) * 1.1 * 100) / 100
+        : option.projectPriceBeforeVAT;
+      
+      if (!option.shippingPriceToClient || 
+          option.shippingPriceToClient === 0 || 
+          Math.abs(option.shippingPriceToClient - prevCalculated) < 0.01) {
         updates.shippingPriceToClient = calculated;
-        needsUpdate = true;
       }
       
-      if (needsUpdate) {
+      if (Object.keys(updates).length > 0) {
         onUpdate(option.id, { ...option, ...updates });
       }
     }
-  }, [option.projectPriceBeforeVAT, hasManuallyEditedShipping]);
+  }, [option.projectPriceBeforeVAT]);
 
   // תמחור לפרויקט ללקוח כולל מע"מ
   useEffect(() => {
@@ -141,10 +143,7 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
                   type="number"
                   step="0.01"
                   value={option.shippingPriceToClient || ""}
-                  onChange={(e) => {
-                    setHasManuallyEditedShipping(true);
-                    onUpdate(option.id, { ...option, shippingPriceToClient: parseFloat(e.target.value) || 0 });
-                  }}
+                  onChange={(e) => onUpdate(option.id, { ...option, shippingPriceToClient: parseFloat(e.target.value) || 0 })}
                   placeholder="0.00"
                   className="text-sm"
                 />

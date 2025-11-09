@@ -94,7 +94,7 @@ export function useQuoteData(initialData?: QuoteData | null) {
       title: `${optionToDuplicate.title} (עותק)`,
       items: optionToDuplicate.items.map(item => ({
         ...item,
-        id: `${item.id}-copy-${Date.now()}`
+        // שמור על ID המקורי של המוצרים מאיירטייבל
       })),
       isCollapsed: false,
     };
