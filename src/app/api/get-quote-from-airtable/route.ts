@@ -128,14 +128,14 @@ export async function GET(request: NextRequest) {
       quoteNumber: fields['מספר הצעה'] || '',
       
       // פרטי לקוח
-      customerName: String(fields['שם לקוח'] || opportunityData?.['שם מלא'] || ''),
-      customerEmail: String(opportunityData?.['Email'] || ''),
-      customerPhone: String(fields['מספר טלפון איש קשר'] || opportunityData?.['טלפון'] || ''),
-      customerCompany: String(opportunityData?.['שם חברה'] || ''),
+      customerName: safeString(fields['שם לקוח'] || opportunityData?.['שם מלא']),
+      customerEmail: safeString(opportunityData?.['Email']),
+      customerPhone: safeString(fields['מספר טלפון איש קשר'] || opportunityData?.['טלפון']),
+      customerCompany: safeString(opportunityData?.['שם חברה']),
       
       // תאריכים
-      deliveryDate: String(fields['תאריך אספקה'] || opportunityData?.['תאריך אספקה מבוקש'] || ''),
-      deliveryTime: String(opportunityData?.['שעת אספקה'] || ''),
+      deliveryDate: safeString(fields['תאריך אספקה'] || opportunityData?.['תאריך אספקה מבוקש']),
+      deliveryTime: safeString(opportunityData?.['שעת אספקה']),
       
       // תקציב וכמויות
       packageQuantity: fields['כמות מארזים'] || opportunityData?.['כמות מארזים'] || null,
@@ -148,23 +148,23 @@ export async function GET(request: NextRequest) {
       // רווחיות
       profitTarget: 36,
       agentCommission: (fields['עמלת סוכן'] || 0) * 100, // המרה ל-%
-      agent: (Array.isArray(fields['סוכן']) ? fields['סוכן'][0] : fields['סוכן']) || (Array.isArray(opportunityData?.['סוכן']) ? opportunityData['סוכן'][0] : opportunityData?.['סוכן']) || null,
+      agent: safeString(safeValue(fields['סוכן']) || safeValue(opportunityData?.['סוכן'])),
       
       // פרטים נוספים
-      deliveryAddress: String(opportunityData?.['כתובת אספקה'] || ''),
-      deliveryType: String(opportunityData?.['הפצה'] || ''),
-      customerNotes: String(fields['איש קשר'] || opportunityData?.['דגשים מהלקוח'] || ''),
-      customerPreferences: String(opportunityData?.['דגשים והעדפות'] || ''),
-      celebration: String(opportunityData?.['מה חוגגים'] || ''),
-      giftRecipients: String(opportunityData?.['מי מקבל את המתנות'] || ''),
+      deliveryAddress: safeString(opportunityData?.['כתובת אספקה']),
+      deliveryType: safeString(opportunityData?.['הפצה']),
+      customerNotes: safeString(fields['איש קשר'] || opportunityData?.['דגשים מהלקוח']),
+      customerPreferences: safeString(opportunityData?.['דגשים והעדפות']),
+      celebration: safeString(opportunityData?.['מה חוגגים']),
+      giftRecipients: safeString(opportunityData?.['מי מקבל את המתנות']),
       
       // גלויות ומדבקות
-      customerCard: String(fields['גלוית לקוח'] || opportunityData?.['גלוית לקוח'] || ''),
-      customerSticker: String(fields['מדבקת לקוח'] || opportunityData?.['מדבקת לקוח'] || ''),
-      preferredPackaging: String(opportunityData?.['סוג אריזה מועדף'] || ''),
+      customerCard: safeString(fields['גלוית לקוח'] || opportunityData?.['גלוית לקוח']),
+      customerSticker: safeString(fields['מדבקת לקוח'] || opportunityData?.['מדבקת לקוח']),
+      preferredPackaging: safeString(opportunityData?.['סוג אריזה מועדף']),
       
       // סטטוס
-      status: String(fields['סטאטוס'] || ''),
+      status: safeString(fields['סטאטוס']),
       
       // הזדמנות מכירה
       opportunityId: fields['הזדמנויות מכירה']?.[0] || null,
