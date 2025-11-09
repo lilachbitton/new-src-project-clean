@@ -546,7 +546,7 @@ export function QuoteOptionCard({
                   </div>
                 </div>
 
-                {/* שדות קלט - יעד רווחיות, סוכן, ועמלה */}
+                {/* שדות קלט */}
                 <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
                   <h4 className="text-sm font-bold text-yellow-700 mb-3">שדות קלט</h4>
                   <div className="grid grid-cols-3 gap-4">
@@ -604,13 +604,29 @@ export function QuoteOptionCard({
                   </div>
                 </div>
 
-                {/* חישובים כספיים - תצוגה בלבד */}
+                {/* חישובים - תצוגה בלבד */}
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                  <h4 className="text-sm font-bold text-blue-700 mb-3">חישובים כספיים</h4>
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                  <h4 className="text-sm font-bold text-blue-700 mb-3">חישובים</h4>
+                  <div className="space-y-1 text-sm">
+                    <div className="flex justify-between py-1 border-b border-blue-100">
+                      <span className="text-gray-600">יעד רווחיות:</span>
+                      <span className="font-semibold">{(option.profitTargetDisplay || option.profitTarget || quoteData.profitTarget || 36).toFixed(0)}%</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-blue-100">
+                      <span className="text-gray-600">עמלת סוכן %:</span>
+                      <span className="font-semibold">{(option.agentCommissionDisplay || option.agentCommission || quoteData.agentCommission || 0).toFixed(0)}%</span>
+                    </div>
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <span className="text-gray-600">מחיר עלות:</span>
                       <span className="font-semibold">₪{(option.costPrice || 0).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-blue-100">
+                      <span className="text-gray-600">הוצאות נוספות:</span>
+                      <span className="font-semibold">₪{(option.additionalExpenses || 0).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-blue-100">
+                      <span className="text-gray-600">עלות עבודת אריזה:</span>
+                      <span className="font-semibold">₪{(option.packagingWorkCost || 0).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <span className="text-gray-600">עלות מוצרי אריזה ומיתוג:</span>
