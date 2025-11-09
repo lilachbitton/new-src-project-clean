@@ -96,6 +96,7 @@ export function useQuoteData(initialData?: QuoteData | null) {
         ...item,
         // שמור על ID המקורי של המוצרים מאיירטייבל
       })),
+      packageNumber: optionToDuplicate.packageNumber, // שמור מספר מארז
       image: optionToDuplicate.image, // שכפל גם את התמונה
       isCollapsed: false,
     };

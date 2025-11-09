@@ -90,6 +90,7 @@ export function QuoteOptionCard({
         onUpdate(option.id, {
           ...option,
           packageId: itemData.id, // שמור את ID המארז!
+          packageNumber: itemData.name, // מספר המארז להפעלת אוטומציה
           title: itemData.name,
           items: [...regularItems, ...packagingItems],
           total: itemData.packagePrice || 0,

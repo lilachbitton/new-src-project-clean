@@ -17,6 +17,7 @@ export interface QuoteOption {
   id: string;
   airtableId?: string; // ID מאיירטייבל
   packageId?: string; // ID של המארז מאיירטייבל
+  packageNumber?: string | null; // מספר מארז - להפעלת אוטומציה של תמונה
   title: string;
   items: Item[];
   total: number;

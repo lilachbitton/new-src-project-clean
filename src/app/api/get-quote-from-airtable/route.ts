@@ -246,7 +246,8 @@ async function buildOptions(optionsData: any[]) {
         projectPriceToClientWithVAT: option['תמחור לפרויקט ללקוח כולל מע"מ CLAUDE'] || 0,
         shippingPriceToClient: option['תמחור משלוח ללקוח CLAUDE'] || 0,
         
-        // תמונה
+        // מארז ותמונה
+        packageNumber: option['מספר מארז'] || null,
         image: option['תמונת מארז']?.[0]?.url || null,
         
         // סטטוס

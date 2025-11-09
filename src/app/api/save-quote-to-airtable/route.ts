@@ -54,7 +54,11 @@ export async function POST(request: NextRequest) {
           'הוצאות נוספות': option.additionalExpenses || 0,
         };
         
-        if (option.packageId && isValidRecordId(option.packageId)) fields['שם מארז'] = [option.packageId];
+        if (option.packageId && isValidRecordId(option.packageId)) {
+          fields['שם מארז'] = [option.packageId];
+          // הוספת מספר מארז כדי להפעיל את האוטומציה של התמונה
+          fields['מספר מארז'] = option.packageNumber || '';
+        }
         if (option.deliveryCompany) fields['חברת משלוחים CLAUDE'] = option.deliveryCompany;
         if (option.projectPriceBeforeVAT !== undefined) fields['תמחור לפרויקט לפני מע"מ CLAUDE'] = option.projectPriceBeforeVAT;
         if (option.shippingPriceToClient !== undefined) fields['תמחור משלוח ללקוח CLAUDE'] = option.shippingPriceToClient;
@@ -82,7 +86,11 @@ export async function POST(request: NextRequest) {
           'שם לקוח': quoteData.customerName || '',
           'הוצאות נוספות': option.additionalExpenses || 0,
         };
-        if (option.packageId && isValidRecordId(option.packageId)) fields['שם מארז'] = [option.packageId];
+        if (option.packageId && isValidRecordId(option.packageId)) {
+          fields['שם מארז'] = [option.packageId];
+          // הוספת מספר מארז כדי להפעיל את האוטומציה של התמונה
+          fields['מספר מארז'] = option.packageNumber || '';
+        }
         const productIds = option.items?.filter((i: any) => i.type === 'product' && isValidRecordId(i.id)).map((i: any) => i.id) || [];
         const packagingIds = option.items?.filter((i: any) => i.type === 'packaging' && isValidRecordId(i.id)).map((i: any) => i.id) || [];
         if (productIds.length) fields['מוצרים'] = productIds;
