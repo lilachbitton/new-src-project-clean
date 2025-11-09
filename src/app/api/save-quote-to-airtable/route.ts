@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     const isValidQuoteRecordId = quoteData.id && isValidRecordId(quoteData.id);
     let quoteRecordId: string;
 
-    // 1. וודא שיש הצעת מחיר
+    // 1. עדכן או צור הצעת מחיר
     if (isValidQuoteRecordId) {
       quoteRecordId = quoteData.id;
       console.log('✅ הצעת מחיר קיימת:', quoteRecordId);

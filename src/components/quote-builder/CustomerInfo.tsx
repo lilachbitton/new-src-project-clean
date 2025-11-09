@@ -156,7 +156,23 @@ export function CustomerInfo({ quoteData, onUpdate }: CustomerInfoProps) {
               <input
                 type="checkbox"
                 checked={quoteData.includeShipping || false}
-                onChange={(e) => updateField('includeShipping', e.target.checked)}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  updateField('includeShipping', checked);
+                  
+                  // אם מסמנים - בדוק אם יש עלות משלוח בכל האופציות
+                  if (checked) {
+                    setTimeout(() => {
+                      const hasOptionsWithoutShipping = quoteData.options.some(
+                        opt => !opt.shippingPriceToClient || opt.shippingPriceToClient === 0
+                      );
+                      
+                      if (hasOptionsWithoutShipping) {
+                        alert('⚠️ שים לב!\n\nנבחרה האופציה "תקציב כולל משלוח" אך ישנן אופציות בהן לא הוזנה עלות משלוח ללקוח.\n\nיש להזין עלות משלוח בכל האופציות על מנת שהחישובים יהיו תקינים.');
+                      }
+                    }, 100);
+                  }
+                }}
                 className="h-4 w-4 text-blue-600 rounded"
               />
               <span className="text-xs font-medium text-gray-700">תקציב כולל משלוח</span>
