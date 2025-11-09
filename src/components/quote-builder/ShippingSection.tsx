@@ -12,6 +12,7 @@ interface ShippingSectionProps {
 
 export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [hasManuallyEditedShipping, setHasManuallyEditedShipping] = useState(false);
 
   const deliveryCompanies = [
     "משלוחים אקספרס",
@@ -50,8 +51,8 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
         needsUpdate = true;
       }
       
-      // עדכן את shippingPriceToClient רק אם הוא ריק או 0
-      if ((!option.shippingPriceToClient || option.shippingPriceToClient === 0) && Math.abs((option.shippingPriceToClient || 0) - calculated) > 0.01) {
+      // עדכן את shippingPriceToClient רק אם לא ערכו ידנית
+      if (!hasManuallyEditedShipping && (!option.shippingPriceToClient || Math.abs(option.shippingPriceToClient - calculated) > 0.01)) {
         updates.shippingPriceToClient = calculated;
         needsUpdate = true;
       }
@@ -60,7 +61,7 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
         onUpdate(option.id, { ...option, ...updates });
       }
     }
-  }, [option.projectPriceBeforeVAT]);
+  }, [option.projectPriceBeforeVAT, hasManuallyEditedShipping]);
 
   // תמחור לפרויקט ללקוח כולל מע"מ
   useEffect(() => {
@@ -140,7 +141,10 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
                   type="number"
                   step="0.01"
                   value={option.shippingPriceToClient || ""}
-                  onChange={(e) => onUpdate(option.id, { ...option, shippingPriceToClient: parseFloat(e.target.value) || 0 })}
+                  onChange={(e) => {
+                    setHasManuallyEditedShipping(true);
+                    onUpdate(option.id, { ...option, shippingPriceToClient: parseFloat(e.target.value) || 0 });
+                  }}
                   placeholder="0.00"
                   className="text-sm"
                 />

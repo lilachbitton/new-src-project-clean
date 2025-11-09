@@ -90,6 +90,7 @@ export function useQuoteData(initialData?: QuoteData | null) {
     const newOption: QuoteOption = {
       ...optionToDuplicate,
       id: String.fromCharCode(65 + quoteData.options.length),
+      airtableId: undefined, // אל תשכפל את airtableId
       title: `${optionToDuplicate.title} (עותק)`,
       items: optionToDuplicate.items.map(item => ({
         ...item,
