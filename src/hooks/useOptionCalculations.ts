@@ -12,113 +12,96 @@ export function useOptionCalculations(
     if (isCalculatingRef.current) return;
     if (!option || !quoteData) return;
 
-    // ספירות בסיסיות
-    const packagingItemsCost = option.items
-      .filter(item => item.type === 'packaging')
-      .reduce((sum, item) => sum + (item.price || 0), 0);
-
-    const productsCost = option.items
-      .filter(item => item.type !== 'packaging')
-      .reduce((sum, item) => sum + (item.price || 0), 0);
-
+    // שדות lookup/rollup - באים מאיירטייבל
+    const unitsPerCarton = option.unitsPerCarton || 1;
+    const packaging = option.items.find(item => item.type === 'packaging')?.name || "";
+    const packagingItemsCost = option.packagingItemsCost || 0; // Rollup מאיירטייבל
+    const productsCost = option.productsCost || 0; // Rollup מאיירטייבל
     const productQuantity = option.items.filter(item => item.type !== 'packaging').length;
 
-    // תקציב למארז לאחר משלוח
-    const budgetPerPackage = quoteData.budgetPerPackage || 0;
-    const includeShippingInBudget = quoteData.includeShipping || false;
-    const shippingCost = option.shippingCost || 0;
+    // נוסחאות מאיירטייבל
     const packageQuantity = quoteData.packageQuantity || 1;
     
-    const budgetAfterShipping = includeShippingInBudget 
-      ? budgetPerPackage - (shippingCost / packageQuantity)
+    // כמות קרטונים: CEILING({כמות מארזים} / {כמות שנכנסת בקרטון})
+    const deliveryBoxesCount = Math.ceil(packageQuantity / unitsPerCarton);
+
+    // תקציב למארז לאחר משלוח: IF({תקציב כולל משלוח}, {תקציב למארז} - ({תמחור משלוח ללקוח} / {כמות מארזים}), {תקציב למארז})
+    const includeShipping = quoteData.includeShipping || false;
+    const budgetPerPackage = quoteData.budgetPerPackage || 0;
+    const shippingPriceToClient = option.shippingPriceBeforeVAT || 0;
+    const budgetAfterShipping = includeShipping 
+      ? budgetPerPackage - (shippingPriceToClient / packageQuantity)
       : budgetPerPackage;
-
-    // עלות עבודת אריזה: {כמות מוצרים}*0.5+IF(FIND("קופסת",{מוצרי אריזה}),2,1)
-    const hasBox = option.items.some(item => 
-      item.type === 'packaging' && item.name?.includes('קופסת')
-    );
-    const packagingWorkCost = productQuantity * 0.5 + (hasBox ? 2 : 1);
-
-    // הובלה במארז
-    const deliveryInPackage = option.includeShipping ? (option.shippingCost || 0) / packageQuantity : 0;
-
-    // הוצאות נוספות
-    const additionalExpenses = option.additionalExpenses || 0;
 
     // מחיר עלות: {תקציב למארז לאחר משלוח}*(1-{יעד רווחיות}-{עמלת סוכן %})
     const profitTarget = option.profitTarget || quoteData.profitTarget || 0.36;
     const agentCommission = option.agentCommission || quoteData.agentCommission || 0;
     const costPrice = budgetAfterShipping * (1 - profitTarget - agentCommission);
 
-    // תקציב נותר למוצרים
+    // הובלה במארז
+    const deliveryInPackage = includeShipping ? (shippingPriceToClient / packageQuantity) : 0;
+
+    // עלות עבודת אריזה: {כמות מוצרים}*0.5+IF(FIND("קופסת",{מוצרי אריזה ומיתוג}),2,1)
+    const hasBox = option.items.some(item => item.type === 'packaging' && item.name?.includes('קופסת'));
+    const packagingWorkCost = productQuantity * 0.5 + (hasBox ? 2 : 1);
+
+    // תקציב נותר למוצרים: {מחיר עלות} - ({הובלה במארז} + {עלות מוצרים בפועל} + {עלות מוצרי אריזה ומיתוג} + {הוצאות נוספות} + {עלות עבודת אריזה})
+    const additionalExpenses = option.additionalExpenses || 0;
     const budgetRemainingForProducts = costPrice - (deliveryInPackage + productsCost + packagingItemsCost + additionalExpenses + packagingWorkCost);
 
-    // רווח לעסקה בשקלים
+    // רווח לעסקה בשקלים: {תקציב למארז לאחר משלוח}-{הובלה במארז}-{עלות מוצרים בפועל}-{הוצאות נוספות}-{עלות מוצרי אריזה ומיתוג}-{עלות עבודת אריזה}-({עמלת סוכן %}*{תקציב למארז לאחר משלוח})
     const profitPerDeal = budgetAfterShipping - deliveryInPackage - productsCost - additionalExpenses - packagingItemsCost - packagingWorkCost - (agentCommission * budgetAfterShipping);
 
-    // % רווח בפועל למארז
+    // % רווח בפועל למארז: ({רווח לעסקה בשקלים})/{תקציב למארז לאחר משלוח}
     const actualProfitPercentage = budgetAfterShipping > 0 ? profitPerDeal / budgetAfterShipping : 0;
 
-    // סה"כ רווח לעסקה
+    // סה"כ רווח לעסקה: {כמות מארזים}*{רווח לעסקה בשקלים}
     const totalDealProfit = packageQuantity * profitPerDeal;
 
-    // הכנסה ללא מע"מ
+    // הכנסה ללא מע"מ: ({תקציב למארז לפני מע"מ} * {כמות מארזים})+{תמחור לפרויקט ללקוח לפני מע"מ}
+    // כרגע מפשט: תקציב*כמות / 1.17
     const revenueWithoutVAT = (budgetPerPackage * packageQuantity) / 1.17;
 
-    // חישובי משלוח
-    const unitsPerCarton = option.unitsPerCarton || 1;
-    const deliveryBoxesCount = packageQuantity > 0 && unitsPerCarton > 0 
-      ? Math.ceil(packageQuantity / unitsPerCarton) 
-      : null;
-
-    // אריזה - מוצר האריזה הראשון
-    const packaging = option.items.find(item => item.type === 'packaging')?.name || "";
-
     // תמחור משלוח ללקוח כולל מע"מ
-    const shippingPriceToClientWithVAT = (option.shippingPriceBeforeVAT || 0) * 1.17;
+    const shippingPriceToClientWithVAT = shippingPriceToClient * 1.17;
 
-    // תמחור משלוח ללקוח לפני מע"מ (אותו דבר כמו העלות)
-    const shippingPriceToClientBeforeVAT = option.shippingPriceBeforeVAT || 0;
-
-    // תמחור סופי - אם לא הוזן ידנית, שווה לחישובי
-    const finalShippingPriceToClient = option.finalShippingPriceToClient ?? shippingPriceToClientBeforeVAT;
+    // תמחור משלוח סופי - אם לא הוזן, שווה לתמחור ללקוח לפני מע"מ
+    const finalShippingPriceToClient = option.finalShippingPriceToClient ?? shippingPriceToClient;
 
     // עדכן
     if (
-      option.packagingItemsCost !== packagingItemsCost ||
-      option.productsCost !== productsCost ||
-      option.productQuantity !== productQuantity ||
+      option.deliveryBoxesCount !== deliveryBoxesCount ||
+      option.packaging !== packaging ||
       option.packagingWorkCost !== packagingWorkCost ||
       option.costPrice !== costPrice ||
       option.budgetRemainingForProducts !== budgetRemainingForProducts ||
-      option.actualProfitPercentage !== actualProfitPercentage ||
       option.profitPerDeal !== profitPerDeal ||
+      option.actualProfitPercentage !== actualProfitPercentage ||
       option.totalDealProfit !== totalDealProfit ||
       option.revenueWithoutVAT !== revenueWithoutVAT ||
-      option.deliveryBoxesCount !== deliveryBoxesCount ||
-      option.packaging !== packaging ||
       option.shippingPriceToClientWithVAT !== shippingPriceToClientWithVAT ||
-      option.shippingPriceToClientBeforeVAT !== shippingPriceToClientBeforeVAT
+      option.shippingPriceToClientBeforeVAT !== shippingPriceToClient
     ) {
       isCalculatingRef.current = true;
       
       onUpdate(option.id, {
         ...option,
-        packagingItemsCost,
-        productsCost,
-        productQuantity,
+        deliveryBoxesCount,
+        packaging,
         packagingWorkCost,
         costPrice,
         budgetRemainingForProducts,
-        actualProfitPercentage,
         profitPerDeal,
+        actualProfitPercentage,
         totalDealProfit,
         revenueWithoutVAT,
-        deliveryBoxesCount,
-        packaging,
         shippingPriceToClientWithVAT,
-        shippingPriceToClientBeforeVAT,
-        finalShippingPriceToClient
+        shippingPriceToClientBeforeVAT: shippingPriceToClient,
+        finalShippingPriceToClient,
+        // שמירת הערכים שבאים מאיירטייבל
+        productQuantity,
+        packagingItemsCost,
+        productsCost
       });
 
       setTimeout(() => {
@@ -130,8 +113,11 @@ export function useOptionCalculations(
     option.additionalExpenses,
     option.profitTarget,
     option.agentCommission,
-    option.shippingCost,
-    option.includeShipping,
+    option.shippingPriceBeforeVAT,
+    option.unitsPerCarton,
+    option.finalShippingPriceToClient,
+    option.packagingItemsCost,
+    option.productsCost,
     quoteData.budgetPerPackage,
     quoteData.packageQuantity,
     quoteData.profitTarget,
