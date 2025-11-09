@@ -51,12 +51,7 @@ export async function POST(request: NextRequest) {
           'Option Letter': option.id,
           'מוצרים': option.items?.filter((i: any) => i.type === 'product' && isValidRecordId(i.id)).map((i: any) => i.id) || [],
           'מוצרי אריזה ומיתוג copy': option.items?.filter((i: any) => i.type === 'packaging' && isValidRecordId(i.id)).map((i: any) => i.id) || [],
-          
-          // שדות קלט בלבד (לא שדות נוסחה)
-          'יעד רווחיות': option.profitTarget ? option.profitTarget / 100 : null,
-          'סוכן': option.agent,
-          'עמלת סוכן %': option.agentCommission ? option.agentCommission / 100 : null,
-          'הוצאות נוספות': option.additionalExpenses,
+          'הוצאות נוספות': option.additionalExpenses || 0,
         };
         if (option.packageId && isValidRecordId(option.packageId)) fields['שם מארז'] = [option.packageId];
         if (option.shippingCost !== undefined) fields['תמחור משלוח ללקוח'] = option.shippingCost;
@@ -84,12 +79,7 @@ export async function POST(request: NextRequest) {
           'Option Letter': option.id,
           'כותרת אופציה': option.title || `אופציה ${option.id}`,
           'שם לקוח': quoteData.customerName || '',
-          
-          // שדות קלט בלבד (לא שדות נוסחה)
-          'יעד רווחיות': option.profitTarget ? option.profitTarget / 100 : null,
-          'סוכן': option.agent,
-          'עמלת סוכן %': option.agentCommission ? option.agentCommission / 100 : null,
-          'הוצאות נוספות': option.additionalExpenses,
+          'הוצאות נוספות': option.additionalExpenses || 0,
         };
         if (option.packageId && isValidRecordId(option.packageId)) fields['שם מארז'] = [option.packageId];
         const productIds = option.items?.filter((i: any) => i.type === 'product' && isValidRecordId(i.id)).map((i: any) => i.id) || [];
