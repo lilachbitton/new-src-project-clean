@@ -40,8 +40,14 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
       const calculated = option.projectPriceBeforeVAT < 600 
         ? option.projectPriceBeforeVAT * 1.1 
         : option.projectPriceBeforeVAT;
+      
       if (option.projectPriceToClientBeforeVAT !== calculated) {
-        onUpdate(option.id, { ...option, projectPriceToClientBeforeVAT: calculated });
+        // עדכן גם את תמחור משלוח ללקוח אם הוא ריק
+        const updates: any = { ...option, projectPriceToClientBeforeVAT: calculated };
+        if (!option.shippingPriceToClient || option.shippingPriceToClient === 0) {
+          updates.shippingPriceToClient = calculated;
+        }
+        onUpdate(option.id, updates);
       }
     }
   }, [option.projectPriceBeforeVAT]);
