@@ -554,8 +554,8 @@ export function QuoteOptionCard({
                       <label className="block text-xs text-gray-600 mb-1">יעד רווחיות (%)</label>
                       <Input
                         type="number"
-                        value={option.profitTarget || quoteData.profitTarget || 36}
-                        onChange={(e) => onUpdate(option.id, { ...option, profitTarget: parseFloat(e.target.value) || 0 })}
+                        value={(option.profitTarget || quoteData.profitTarget || 36) * 100}
+                        onChange={(e) => onUpdate(option.id, { ...option, profitTarget: (parseFloat(e.target.value) || 0) / 100 })}
                         placeholder="36"
                         className="text-sm"
                       />
@@ -573,30 +573,20 @@ export function QuoteOptionCard({
                       <label className="block text-xs text-gray-600 mb-1">עמלת סוכן (%)</label>
                       <Input
                         type="number"
-                        value={option.agentCommission || quoteData.agentCommission || 0}
-                        onChange={(e) => onUpdate(option.id, { ...option, agentCommission: parseFloat(e.target.value) || 0 })}
+                        value={(option.agentCommission || quoteData.agentCommission || 0) * 100}
+                        onChange={(e) => onUpdate(option.id, { ...option, agentCommission: (parseFloat(e.target.value) || 0) / 100 })}
                         placeholder="0"
                         className="text-sm"
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="grid grid-cols-1 gap-4 mt-4">
                     <div>
                       <label className="block text-xs text-gray-600 mb-1">הוצאות נוספות (₪)</label>
                       <Input
                         type="number"
                         value={option.additionalExpenses || 0}
                         onChange={(e) => onUpdate(option.id, { ...option, additionalExpenses: parseFloat(e.target.value) || 0 })}
-                        placeholder="0"
-                        className="text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">עלות עבודת אריזה (₪)</label>
-                      <Input
-                        type="number"
-                        value={option.packagingWorkCost || 0}
-                        onChange={(e) => onUpdate(option.id, { ...option, packagingWorkCost: parseFloat(e.target.value) || 0 })}
                         placeholder="0"
                         className="text-sm"
                       />
@@ -610,19 +600,15 @@ export function QuoteOptionCard({
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <span className="text-gray-600">יעד רווחיות:</span>
-                      <span className="font-semibold">{(option.profitTargetDisplay || option.profitTarget || quoteData.profitTarget || 36).toFixed(0)}%</span>
+                      <span className="font-semibold">{((option.profitTarget || quoteData.profitTarget || 0.36) * 100).toFixed(0)}%</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <span className="text-gray-600">עמלת סוכן %:</span>
-                      <span className="font-semibold">{(option.agentCommissionDisplay || option.agentCommission || quoteData.agentCommission || 0).toFixed(0)}%</span>
+                      <span className="font-semibold">{((option.agentCommission || quoteData.agentCommission || 0) * 100).toFixed(0)}%</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <span className="text-gray-600">מחיר עלות:</span>
                       <span className="font-semibold">₪{(option.costPrice || 0).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between py-1 border-b border-blue-100">
-                      <span className="text-gray-600">הוצאות נוספות:</span>
-                      <span className="font-semibold">₪{(option.additionalExpenses || 0).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <span className="text-gray-600">עלות עבודת אריזה:</span>
@@ -646,7 +632,7 @@ export function QuoteOptionCard({
                     </div>
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <span className="text-gray-600">% רווח בפועל למארז:</span>
-                      <span className="font-semibold text-green-600">{(option.actualProfitPercentage || 0).toFixed(2)}%</span>
+                      <span className="font-semibold text-green-600">{((option.actualProfitPercentage || 0) * 100).toFixed(2)}%</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-green-100">
                       <span className="text-gray-700 font-medium">רווח לעסקה בשקלים:</span>
