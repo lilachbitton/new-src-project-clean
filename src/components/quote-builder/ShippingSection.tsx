@@ -34,36 +34,27 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
     }
   }, [option.projectPriceBeforeVAT]);
 
-  // תמחור לפרויקט ללקוח לפני מע"מ ותמחור משלוח ללקוח
+  // תלוי ב-projectPriceBeforeVAT בלבד
+  const prevProjectPriceRef = React.useRef(option.projectPriceBeforeVAT);
+  
   useEffect(() => {
-    if (option.projectPriceBeforeVAT !== undefined && option.projectPriceBeforeVAT !== null) {
-      const calculated = option.projectPriceBeforeVAT < 600 
-        ? Math.round(option.projectPriceBeforeVAT * 1.1 * 100) / 100
-        : option.projectPriceBeforeVAT;
+    // בדוק אם projectPriceBeforeVAT השתנה
+    if (option.projectPriceBeforeVAT !== prevProjectPriceRef.current) {
+      prevProjectPriceRef.current = option.projectPriceBeforeVAT;
       
-      const updates: any = {};
-      
-      // עדכן projectPriceToClientBeforeVAT
-      if (Math.abs((option.projectPriceToClientBeforeVAT || 0) - calculated) > 0.01) {
-        updates.projectPriceToClientBeforeVAT = calculated;
-      }
-      
-      // עדכן shippingPriceToClient רק אם הוא ריק או שווה לחישוב הקודם (לא עורך ידנית)
-      const prevCalculated = option.projectPriceBeforeVAT < 600 
-        ? Math.round((option.projectPriceBeforeVAT / 1.1) * 1.1 * 100) / 100
-        : option.projectPriceBeforeVAT;
-      
-      if (!option.shippingPriceToClient || 
-          option.shippingPriceToClient === 0 || 
-          Math.abs(option.shippingPriceToClient - prevCalculated) < 0.01) {
-        updates.shippingPriceToClient = calculated;
-      }
-      
-      if (Object.keys(updates).length > 0) {
-        onUpdate(option.id, { ...option, ...updates });
+      if (option.projectPriceBeforeVAT !== undefined && option.projectPriceBeforeVAT !== null) {
+        const calculated = option.projectPriceBeforeVAT < 600 
+          ? Math.round(option.projectPriceBeforeVAT * 1.1 * 100) / 100
+          : option.projectPriceBeforeVAT;
+        
+        onUpdate(option.id, { 
+          ...option, 
+          projectPriceToClientBeforeVAT: calculated,
+          shippingPriceToClient: calculated 
+        });
       }
     }
-  }, [option.projectPriceBeforeVAT]);
+  }, [option.projectPriceBeforeVAT, option.id, onUpdate]);
 
   // תמחור לפרויקט ללקוח כולל מע"מ
   useEffect(() => {
