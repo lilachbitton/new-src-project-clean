@@ -44,9 +44,14 @@ export interface QuoteOption {
   // Shipping fields
   shippingCost?: number;
   includeShipping?: boolean;
-  deliveryCompany?: string;
-  deliveryAddress?: string;
-  deliveryBoxesCount?: number | null;
+  deliveryCompany?: string; // חברת משלוחים (מושך מאיירטייבל)
+  deliveryBoxesCount?: number | null; // כמות קרטונים - שדה חישובי
+  unitsPerCarton?: number; // כמות שנכנסת בקרטון - סטטי
+  packaging?: string; // אריזה - מוצר האריזה שנבחר
+  shippingPriceBeforeVAT?: number; // תמחור משלוח לפני מע"מ - קלט עלות מחברת משלוחים
+  shippingPriceToClientWithVAT?: number; // תמחור משלוח ללקוח כולל מע"מ - חישובי
+  shippingPriceToClientBeforeVAT?: number; // תמחור משלוח ללקוח לפני מע"מ - חישובי 
+  finalShippingPriceToClient?: number; // תמחור משלוח סופי ללקוח - קלט (מתמלא אוטומטית מהחישובי אבל ניתן לשינוי)
   
   // Status fields
   status?: string;

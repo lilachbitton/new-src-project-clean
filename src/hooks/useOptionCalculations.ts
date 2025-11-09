@@ -65,6 +65,24 @@ export function useOptionCalculations(
     // הכנסה ללא מע"מ
     const revenueWithoutVAT = (budgetPerPackage * packageQuantity) / 1.17;
 
+    // חישובי משלוח
+    const unitsPerCarton = option.unitsPerCarton || 1;
+    const deliveryBoxesCount = packageQuantity > 0 && unitsPerCarton > 0 
+      ? Math.ceil(packageQuantity / unitsPerCarton) 
+      : null;
+
+    // אריזה - מוצר האריזה הראשון
+    const packaging = option.items.find(item => item.type === 'packaging')?.name || "";
+
+    // תמחור משלוח ללקוח כולל מע"מ
+    const shippingPriceToClientWithVAT = (option.shippingPriceBeforeVAT || 0) * 1.17;
+
+    // תמחור משלוח ללקוח לפני מע"מ (אותו דבר כמו העלות)
+    const shippingPriceToClientBeforeVAT = option.shippingPriceBeforeVAT || 0;
+
+    // תמחור סופי - אם לא הוזן ידנית, שווה לחישובי
+    const finalShippingPriceToClient = option.finalShippingPriceToClient ?? shippingPriceToClientBeforeVAT;
+
     // עדכן
     if (
       option.packagingItemsCost !== packagingItemsCost ||
@@ -76,7 +94,11 @@ export function useOptionCalculations(
       option.actualProfitPercentage !== actualProfitPercentage ||
       option.profitPerDeal !== profitPerDeal ||
       option.totalDealProfit !== totalDealProfit ||
-      option.revenueWithoutVAT !== revenueWithoutVAT
+      option.revenueWithoutVAT !== revenueWithoutVAT ||
+      option.deliveryBoxesCount !== deliveryBoxesCount ||
+      option.packaging !== packaging ||
+      option.shippingPriceToClientWithVAT !== shippingPriceToClientWithVAT ||
+      option.shippingPriceToClientBeforeVAT !== shippingPriceToClientBeforeVAT
     ) {
       isCalculatingRef.current = true;
       
@@ -92,6 +114,11 @@ export function useOptionCalculations(
         profitPerDeal,
         totalDealProfit,
         revenueWithoutVAT,
+        deliveryBoxesCount,
+        packaging,
+        shippingPriceToClientWithVAT,
+        shippingPriceToClientBeforeVAT,
+        finalShippingPriceToClient
       });
 
       setTimeout(() => {

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { QuoteData, QuoteOption, Item } from '@/types';
 import { useOptionCalculations } from '@/hooks/useOptionCalculations';
+import { ShippingSection } from './ShippingSection';
 import { 
   ChevronDown, 
   Copy, 
@@ -498,53 +499,10 @@ export function QuoteOptionCard({
             {option.items.length > 0 && (
               <div className="mt-6 space-y-4">
                 {/* עלויות משלוח */}
-                <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                  <h4 className="text-sm font-bold text-purple-700 mb-3">עלויות משלוח</h4>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">כתובת אספקה</label>
-                      <Input
-                        value={option.deliveryAddress || ""}
-                        onChange={(e) => onUpdate(option.id, { ...option, deliveryAddress: e.target.value })}
-                        placeholder="כתובת"
-                        className="text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">חברת משלוחים</label>
-                      <select
-                        value={option.deliveryCompany || ""}
-                        onChange={(e) => onUpdate(option.id, { ...option, deliveryCompany: e.target.value })}
-                        className="w-full px-3 py-2 text-sm border rounded-md"
-                      >
-                        <option value="">בחר</option>
-                        <option value="חינם">חינם</option>
-                        <option value="8">8 ש"ח</option>
-                        <option value="16">16 ש"ח</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">כמות קרטונים</label>
-                      <Input
-                        type="number"
-                        value={option.deliveryBoxesCount || ""}
-                        onChange={(e) => onUpdate(option.id, { ...option, deliveryBoxesCount: parseInt(e.target.value) || null })}
-                        placeholder="0"
-                        className="text-sm"
-                      />
-                    </div>
-                  </div>
-                  <div className="mt-3">
-                    <label className="block text-xs text-gray-600 mb-1">תמחור משלוח ללקוח (₪)</label>
-                    <Input
-                      type="number"
-                      value={option.shippingCost || ""}
-                      onChange={(e) => onUpdate(option.id, { ...option, shippingCost: parseFloat(e.target.value) || 0 })}
-                      placeholder="0"
-                      className="text-sm w-32"
-                    />
-                  </div>
-                </div>
+                <ShippingSection 
+                  option={option}
+                  onUpdate={onUpdate}
+                />
 
                 {/* שדות קלט */}
                 <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
