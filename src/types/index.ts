@@ -41,17 +41,17 @@ export interface QuoteOption {
   revenueWithoutVAT?: number; // הכנסה ללא מע"מ
   actualProfit?: number; // רווח בפועל למארז (בשקלים)
   
-  // Shipping fields
-  shippingCost?: number;
-  includeShipping?: boolean;
-  deliveryCompany?: string; // חברת משלוחים (מושך מאיירטייבל)
-  deliveryBoxesCount?: number | null; // כמות קרטונים - שדה חישובי
-  unitsPerCarton?: number; // כמות שנכנסת בקרטון - סטטי
-  packaging?: string; // אריזה - מוצר האריזה שנבחר
-  shippingPriceBeforeVAT?: number; // תמחור משלוח לפני מע"מ - קלט עלות מחברת משלוחים
-  shippingPriceToClientWithVAT?: number; // תמחור משלוח ללקוח כולל מע"מ - חישובי
-  shippingPriceToClientBeforeVAT?: number; // תמחור משלוח ללקוח לפני מע"מ - חישובי 
-  finalShippingPriceToClient?: number; // תמחור משלוח סופי ללקוח - קלט (מתמלא אוטומטית מהחישובי אבל ניתן לשינוי)
+  // Shipping fields - מאיירטייבל
+  deliveryCompany?: string; // fldZ6awiJutIW9Xys - חברת משלוחים
+  packaging?: string; // fldKIHATOl5fs0fNe - אריזה (lookup)
+  unitsPerCarton?: number; // fldlUzUgYtCzHqMUH - כמות שנכנסת בקרטון (lookup)
+  deliveryBoxesCount?: number; // fldgFizG5ulcqnOGh - כמות קרטונים להובלה (formula)
+  shippingCompanyCost?: number; // fldJA3rlQKTvVEEj7 - עלות חברת משלוחים (קלט)
+  shippingPriceToClient?: number; // fldSvnNx86B5x79U9 - תמחור משלוח ללקוח (קלט)
+  projectPriceBeforeVAT?: number; // fld0xt9R9bJ4dEPHt - תמחור לפרויקט לפני מע"מ (קלט)
+  projectPriceWithVAT?: number; // fldRYo0QG6AhcqCcU - תמחור לפרויקט כולל מע"מ (formula)
+  projectPriceToClientBeforeVAT?: number; // fld9unHyYU9yivqTo - תמחור לפרויקט ללקוח לפני מע"מ (formula)
+  projectPriceToClientWithVAT?: number; // fldd84rqvGunQcnrC - תמחור לפרויקט ללקוח כולל מע"מ (formula)
   
   // Status fields
   status?: string;

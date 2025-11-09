@@ -13,17 +13,15 @@ interface ShippingSectionProps {
 export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  // אופציות חברת משלוחים מאיירטייבל
   const deliveryCompanies = [
     "משלוחים אקספרס",
     "טיק טוק משלוחים", 
     "הבימה משלוחים",
     "איסוף עצמי"
-  ]; 
+  ];
 
   return (
     <div className="bg-purple-50 rounded-lg border border-purple-200 overflow-hidden">
-      {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-center justify-between p-4 hover:bg-purple-100 transition-colors"
@@ -34,32 +32,24 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
         />
       </button>
 
-      {/* Content */}
       {isExpanded && (
         <div className="p-4 pt-0 space-y-4">
           
-          {/* שדות סטטיים */}
+          {/* שדות סטטיים/lookup */}
           <div className="bg-white p-3 rounded border border-purple-100">
             <div className="text-xs font-semibold text-purple-600 mb-2">מידע כללי</div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-gray-600 mb-1">כמות שנכנסת בקרטון</label>
-                <Input
-                  type="number"
-                  value={option.unitsPerCarton || ""}
-                  onChange={(e) => onUpdate(option.id, { ...option, unitsPerCarton: parseInt(e.target.value) || undefined })}
-                  placeholder="0"
-                  className="text-sm"
-                />
+                <div className="text-sm font-semibold p-2 bg-gray-50 rounded border">
+                  {option.unitsPerCarton || '-'}
+                </div>
               </div>
               <div>
                 <label className="block text-xs text-gray-600 mb-1">אריזה</label>
-                <Input
-                  value={option.packaging || ""}
-                  readOnly
-                  className="text-sm bg-gray-50"
-                  placeholder="יבחר אוטומטית"
-                />
+                <div className="text-sm p-2 bg-gray-50 rounded border truncate">
+                  {option.packaging || '-'}
+                </div>
               </div>
             </div>
           </div>
@@ -67,7 +57,7 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
           {/* שדות קלט */}
           <div className="bg-white p-3 rounded border border-purple-100">
             <div className="text-xs font-semibold text-purple-600 mb-2">פרטי משלוח</div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-3">
               <div>
                 <label className="block text-xs text-gray-600 mb-1">חברת משלוחים</label>
                 <select
@@ -82,12 +72,34 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-gray-600 mb-1">עלות משלוח מהספק (₪)</label>
+                <label className="block text-xs text-gray-600 mb-1">עלות חברת משלוחים (₪)</label>
                 <Input
                   type="number"
                   step="0.01"
-                  value={option.shippingPriceBeforeVAT || ""}
-                  onChange={(e) => onUpdate(option.id, { ...option, shippingPriceBeforeVAT: parseFloat(e.target.value) || 0 })}
+                  value={option.shippingCompanyCost || ""}
+                  onChange={(e) => onUpdate(option.id, { ...option, shippingCompanyCost: parseFloat(e.target.value) || 0 })}
+                  placeholder="0.00"
+                  className="text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">תמחור משלוח ללקוח (₪)</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={option.shippingPriceToClient || ""}
+                  onChange={(e) => onUpdate(option.id, { ...option, shippingPriceToClient: parseFloat(e.target.value) || 0 })}
+                  placeholder="0.00"
+                  className="text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">תמחור לפרויקט לפני מע"מ (₪)</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={option.projectPriceBeforeVAT || ""}
+                  onChange={(e) => onUpdate(option.id, { ...option, projectPriceBeforeVAT: parseFloat(e.target.value) || 0 })}
                   placeholder="0.00"
                   className="text-sm"
                 />
@@ -104,29 +116,17 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
                 <span className="font-semibold">{option.deliveryBoxesCount || 0}</span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-gray-600">תמחור משלוח ללקוח כולל מע"מ:</span>
-                <span className="font-semibold">₪{(option.shippingPriceToClientWithVAT || 0).toFixed(2)}</span>
+                <span className="text-gray-600">תמחור לפרויקט כולל מע"מ:</span>
+                <span className="font-semibold">₪{(option.projectPriceWithVAT || 0).toFixed(2)}</span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-gray-600">תמחור משלוח ללקוח לפני מע"מ:</span>
-                <span className="font-semibold">₪{(option.shippingPriceToClientBeforeVAT || 0).toFixed(2)}</span>
+                <span className="text-gray-600">תמחור לפרויקט ללקוח לפני מע"מ:</span>
+                <span className="font-semibold">₪{(option.projectPriceToClientBeforeVAT || 0).toFixed(2)}</span>
               </div>
-            </div>
-          </div>
-
-          {/* מחיר סופי */}
-          <div className="bg-white p-3 rounded border border-purple-100">
-            <div className="text-xs font-semibold text-purple-600 mb-2">מחיר סופי ללקוח</div>
-            <div>
-              <label className="block text-xs text-gray-600 mb-1">תמחור משלוח סופי (ניתן לעריכה)</label>
-              <Input
-                type="number"
-                step="0.01"
-                value={option.finalShippingPriceToClient ?? option.shippingPriceToClientBeforeVAT ?? ""}
-                onChange={(e) => onUpdate(option.id, { ...option, finalShippingPriceToClient: parseFloat(e.target.value) || 0 })}
-                placeholder="0.00"
-                className="text-sm font-semibold"
-              />
+              <div className="flex justify-between py-1">
+                <span className="text-gray-600">תמחור לפרויקט ללקוח כולל מע"מ:</span>
+                <span className="font-semibold">₪{(option.projectPriceToClientWithVAT || 0).toFixed(2)}</span>
+              </div>
             </div>
           </div>
 
