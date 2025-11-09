@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useMemo, useState } from 'react';
 import { QuoteOption, QuoteData } from '@/types';
 
 export function useOptionCalculations(
@@ -6,8 +6,6 @@ export function useOptionCalculations(
   quoteData: QuoteData,
   onUpdate: (optionId: string, updatedOption: QuoteOption) => void
 ) {
-  const isCalculatingRef = useRef(false);
-
   // Track items changes with useMemo
   const itemsHash = useMemo(() => {
     return JSON.stringify(
@@ -21,7 +19,6 @@ export function useOptionCalculations(
   }, [option.items]);
 
   useEffect(() => {
-    if (isCalculatingRef.current) return;
     if (!option || !quoteData) return;
 
     // שדות lookup - באים מאיירטייבל
@@ -96,49 +93,25 @@ export function useOptionCalculations(
     // רווח בפועל למארז
     const actualProfit = profitPerDeal;
 
-    // עדכן
-    if (
-      option.deliveryBoxesCount !== deliveryBoxesCount ||
-      option.projectPriceWithVAT !== projectPriceWithVAT ||
-      option.projectPriceToClientBeforeVAT !== projectPriceToClientBeforeVAT ||
-      option.projectPriceToClientWithVAT !== projectPriceToClientWithVAT ||
-      option.packagingWorkCost !== packagingWorkCost ||
-      option.costPrice !== costPrice ||
-      option.budgetRemainingForProducts !== budgetRemainingForProducts ||
-      option.profitPerDeal !== profitPerDeal ||
-      option.actualProfitPercentage !== actualProfitPercentage ||
-      option.totalDealProfit !== totalDealProfit ||
-      option.revenueWithoutVAT !== revenueWithoutVAT ||
-      option.productQuantity !== productQuantity ||
-      option.packagingItemsCost !== packagingItemsCost ||
-      option.productsCost !== productsCost ||
-      option.actualProfit !== actualProfit
-    ) {
-      isCalculatingRef.current = true;
-      
-      onUpdate(option.id, {
-        ...option,
-        deliveryBoxesCount,
-        projectPriceWithVAT,
-        projectPriceToClientBeforeVAT,
-        projectPriceToClientWithVAT,
-        packagingWorkCost,
-        costPrice,
-        budgetRemainingForProducts,
-        profitPerDeal,
-        actualProfitPercentage,
-        totalDealProfit,
-        revenueWithoutVAT,
-        productQuantity,
-        packagingItemsCost,
-        productsCost,
-        actualProfit
-      });
-
-      setTimeout(() => {
-        isCalculatingRef.current = false;
-      }, 0);
-    }
+    // עדכן מיד - בלי בדיקת שינויים
+    onUpdate(option.id, {
+      ...option,
+      deliveryBoxesCount,
+      projectPriceWithVAT,
+      projectPriceToClientBeforeVAT,
+      projectPriceToClientWithVAT,
+      packagingWorkCost,
+      costPrice,
+      budgetRemainingForProducts,
+      profitPerDeal,
+      actualProfitPercentage,
+      totalDealProfit,
+      revenueWithoutVAT,
+      productQuantity,
+      packagingItemsCost,
+      productsCost,
+      actualProfit
+    });
   }, [
     itemsHash,
     option.additionalExpenses,
@@ -153,6 +126,7 @@ export function useOptionCalculations(
     quoteData.profitTarget,
     quoteData.agentCommission,
     quoteData.includeShipping,
-    option.id
+    option.id,
+    onUpdate
   ]);
 }
