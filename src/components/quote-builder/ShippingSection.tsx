@@ -21,14 +21,8 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
   ];
 
   // חישובים אוטומטיים - כמות קרטונים להובלה
-  useEffect(() => {
-    if (option.packageQuantity && option.unitsPerCarton) {
-      const calculated = Math.ceil(option.packageQuantity / option.unitsPerCarton);
-      if (option.deliveryBoxesCount !== calculated) {
-        onUpdate(option.id, { ...option, deliveryBoxesCount: calculated });
-      }
-    }
-  }, [option.packageQuantity, option.unitsPerCarton]);
+  // הנוסחה: CEILING(כמות מארזים / כמות שנכנסת בקרטון)
+  // כמות מארזים זה שדה ברמת הציטוט, לא האופציה - לכן לא מחושב פה
 
   // תמחור לפרויקט כולל מע"מ
   useEffect(() => {
