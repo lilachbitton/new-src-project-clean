@@ -12,7 +12,7 @@ export function useOptionCalculations(
     if (isCalculatingRef.current) return;
     if (!option || !quoteData) return;
 
-    // חישובי בסיס
+    // ספירות בסיסיות
     const packagingItemsCost = option.items
       .filter(item => item.type === 'packaging')
       .reduce((sum, item) => sum + (item.price || 0), 0);
@@ -23,40 +23,55 @@ export function useOptionCalculations(
 
     const productQuantity = option.items.filter(item => item.type !== 'packaging').length;
 
-    // עלות עבודת אריזה (נוסחה מאיירטייבל)
-    const packagingWorkCost = productQuantity * 0.5 + (option.items.some(item => item.name?.includes('קופסת')) ? 2 : 1);
-
-    // תקציב נותר למוצרים
+    // תקציב למארז לאחר משלוח
     const budgetPerPackage = quoteData.budgetPerPackage || 0;
+    const includeShippingInBudget = quoteData.includeShipping || false;
+    const shippingCost = option.shippingCost || 0;
+    const packageQuantity = quoteData.packageQuantity || 1;
+    
+    const budgetAfterShipping = includeShippingInBudget 
+      ? budgetPerPackage - (shippingCost / packageQuantity)
+      : budgetPerPackage;
+
+    // עלות עבודת אריזה: {כמות מוצרים}*0.5+IF(FIND("קופסת",{מוצרי אריזה}),2,1)
+    const hasBox = option.items.some(item => 
+      item.type === 'packaging' && item.name?.includes('קופסת')
+    );
+    const packagingWorkCost = productQuantity * 0.5 + (hasBox ? 2 : 1);
+
+    // הובלה במארז
+    const deliveryInPackage = option.includeShipping ? (option.shippingCost || 0) / packageQuantity : 0;
+
+    // הוצאות נוספות
+    const additionalExpenses = option.additionalExpenses || 0;
+
+    // מחיר עלות: {תקציב למארז לאחר משלוח}*(1-{יעד רווחיות}-{עמלת סוכן %})
     const profitTarget = option.profitTarget || quoteData.profitTarget || 0.36;
     const agentCommission = option.agentCommission || quoteData.agentCommission || 0;
-    const additionalExpenses = option.additionalExpenses || 0;
-    const shippingCostPerUnit = option.includeShipping && option.shippingCost ? option.shippingCost / (quoteData.packageQuantity || 1) : 0;
+    const costPrice = budgetAfterShipping * (1 - profitTarget - agentCommission);
 
-    const budgetRemainingForProducts = budgetPerPackage - 
-      (shippingCostPerUnit + productsCost + packagingItemsCost + additionalExpenses + packagingWorkCost);
-
-    // % רווח בפועל למארז
-    const actualProfitPercentage = budgetPerPackage > 0
-      ? ((budgetPerPackage - productsCost - packagingItemsCost - packagingWorkCost - additionalExpenses) / budgetPerPackage)
-      : 0;
+    // תקציב נותר למוצרים
+    const budgetRemainingForProducts = costPrice - (deliveryInPackage + productsCost + packagingItemsCost + additionalExpenses + packagingWorkCost);
 
     // רווח לעסקה בשקלים
-    const actualProfit = budgetPerPackage - productsCost - packagingItemsCost - packagingWorkCost - additionalExpenses - (budgetPerPackage * agentCommission);
-    const profitPerDeal = actualProfit * (quoteData.packageQuantity || 1);
+    const profitPerDeal = budgetAfterShipping - deliveryInPackage - productsCost - additionalExpenses - packagingItemsCost - packagingWorkCost - (agentCommission * budgetAfterShipping);
+
+    // % רווח בפועל למארז
+    const actualProfitPercentage = budgetAfterShipping > 0 ? profitPerDeal / budgetAfterShipping : 0;
 
     // סה"כ רווח לעסקה
-    const totalDealProfit = profitPerDeal;
+    const totalDealProfit = packageQuantity * profitPerDeal;
 
     // הכנסה ללא מע"מ
-    const revenueWithoutVAT = (budgetPerPackage * (quoteData.packageQuantity || 1)) / 1.17;
+    const revenueWithoutVAT = (budgetPerPackage * packageQuantity) / 1.17;
 
-    // עדכן רק אם יש שינוי
+    // עדכן
     if (
       option.packagingItemsCost !== packagingItemsCost ||
       option.productsCost !== productsCost ||
       option.productQuantity !== productQuantity ||
       option.packagingWorkCost !== packagingWorkCost ||
+      option.costPrice !== costPrice ||
       option.budgetRemainingForProducts !== budgetRemainingForProducts ||
       option.actualProfitPercentage !== actualProfitPercentage ||
       option.profitPerDeal !== profitPerDeal ||
@@ -71,6 +86,7 @@ export function useOptionCalculations(
         productsCost,
         productQuantity,
         packagingWorkCost,
+        costPrice,
         budgetRemainingForProducts,
         actualProfitPercentage,
         profitPerDeal,
@@ -93,6 +109,7 @@ export function useOptionCalculations(
     quoteData.packageQuantity,
     quoteData.profitTarget,
     quoteData.agentCommission,
+    quoteData.includeShipping,
     option.id,
     onUpdate
   ]);
