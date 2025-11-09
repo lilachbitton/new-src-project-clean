@@ -160,6 +160,20 @@ export function useQuoteData(initialData?: QuoteData | null) {
       
       // עדכן את ה-Record ID וה-Option IDs אחרי שמירה מוצלחת
       if (result.quoteRecordId) {
+        // טען מחדש את הנתונים מאיירטייבל כדי לקבל את התמונות המעודכנות
+        try {
+          const refreshResponse = await fetch(`/api/get-quote-from-airtable?quoteId=${result.quoteRecordId}`);
+          if (refreshResponse.ok) {
+            const refreshedData = await refreshResponse.json();
+            console.log('✅ נתונים רועננו מאיירטייבל');
+            setQuoteData(refreshedData);
+            return result;
+          }
+        } catch (refreshError) {
+          console.error('⚠️ לא הצלחנו לרענן את התמונות:', refreshError);
+        }
+        
+        // אם הריענון נכשל, עדכן לפחות את ה-IDs
         setQuoteData(prev => {
           if (!prev) return null;
           
