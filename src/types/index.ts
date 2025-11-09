@@ -24,8 +24,10 @@ export interface QuoteOption {
   
   // Calculation fields
   profitTarget?: number; // יעד רווחיות
+  profitTargetDisplay?: number; // יעד רווחיות לתצוגה
   agent?: string; // סוכן
   agentCommission?: number; // עמלת סוכן %
+  agentCommissionDisplay?: number; // עמלת סוכן לתצוגה
   costPrice?: number; // מחיר עלות
   additionalExpenses?: number; // הוצאות נוספות
   packagingWorkCost?: number; // עלות עבודת אריזה
