@@ -168,7 +168,7 @@ export async function GET(request: NextRequest) {
       
       // הזדמנות מכירה
       opportunityId: fields['הזדמנויות מכירה']?.[0] || null,
-      occasion: opportunityData?.['מועד'] || [],
+      occasion: Array.isArray(opportunityData?.['מועד']) ? opportunityData['מועד'] : [],
       
       // אופציות
       options: await buildOptions(optionsData),
