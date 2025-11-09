@@ -34,7 +34,7 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
     }
   }, [option.projectPriceBeforeVAT]);
 
-  // תלוי ב-projectPriceBeforeVAT בלבד
+  // תלוי ב-projectPriceBeforeVAT בלבד - מעדכן רק את projectPriceToClientBeforeVAT
   const prevProjectPriceRef = React.useRef(option.projectPriceBeforeVAT);
   
   useEffect(() => {
@@ -47,10 +47,11 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
           ? Math.round(option.projectPriceBeforeVAT * 1.1 * 100) / 100
           : option.projectPriceBeforeVAT;
         
+        // עדכן רק את projectPriceToClientBeforeVAT
+        // shippingPriceToClient יתעדכן בזמן ההזנה אם השדה ריק
         onUpdate(option.id, { 
           ...option, 
-          projectPriceToClientBeforeVAT: calculated,
-          shippingPriceToClient: calculated 
+          projectPriceToClientBeforeVAT: calculated
         });
       }
     }
@@ -123,7 +124,19 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
                   type="number"
                   step="0.01"
                   value={option.projectPriceBeforeVAT || ""}
-                  onChange={(e) => onUpdate(option.id, { ...option, projectPriceBeforeVAT: parseFloat(e.target.value) || 0 })}
+                  onChange={(e) => {
+                    const newValue = parseFloat(e.target.value) || 0;
+                    const calculated = newValue < 600 
+                      ? Math.round(newValue * 1.1 * 100) / 100
+                      : newValue;
+                    
+                    // עדכון מיידי - אם shippingPriceToClient ריק, מלא אותו בערך המחושב
+                    onUpdate(option.id, { 
+                      ...option, 
+                      projectPriceBeforeVAT: newValue,
+                      shippingPriceToClient: (!option.shippingPriceToClient || option.shippingPriceToClient === 0) ? calculated : option.shippingPriceToClient
+                    });
+                  }}
                   placeholder="0.00"
                   className="text-sm"
                 />
