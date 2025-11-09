@@ -6,9 +6,40 @@ const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
 const QUOTES_TABLE = 'tbl9d2UhyRrNVjGxW';
 const OPTIONS_TABLE = 'tblkRYwCcYfEG6iAO';
 const OPPORTUNITIES_TABLE = 'tbl4fGlUM8KCbCS0R';
+const PACKAGES_TABLE = 'tblEryHPd3zukaV99';
 
 function isValidRecordId(id: string): boolean {
   return /^rec[a-zA-Z0-9]{14}$/.test(id);
+}
+
+async function fetchPackageImage(packageId: string): Promise<string | null> {
+  try {
+    const response = await fetch(
+      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${PACKAGES_TABLE}/${packageId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${AIRTABLE_API_KEY}`,
+        },
+      }
+    );
+    
+    if (!response.ok) {
+      console.warn(`⚠️ לא הצלחתי למשוך מידע על מארז ${packageId}`);
+      return null;
+    }
+    
+    const packageData = await response.json();
+    const imageUrl = packageData.fields['תמונת מארז']?.[0]?.url;
+    
+    if (imageUrl) {
+      console.log(`✅ נמצאה תמונה למארז ${packageId}`);
+    }
+    
+    return imageUrl || null;
+  } catch (error) {
+    console.error('❌ שגיאה במשיכת תמונת מארז:', error);
+    return null;
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -54,11 +85,17 @@ export async function POST(request: NextRequest) {
           'הוצאות נוספות': option.additionalExpenses || 0,
         };
         
+        // עדכון מארז ותמונה
         if (option.packageId && isValidRecordId(option.packageId)) {
           fields['שם מארז'] = [option.packageId];
-          // הוספת מספר מארז כדי להפעיל את האוטומציה של התמונה
-          fields['מספר מארז'] = option.packageNumber || '';
+          
+          // משוך תמונה ישירות מהמארז
+          const imageUrl = await fetchPackageImage(option.packageId);
+          if (imageUrl) {
+            fields['תמונת מארז'] = [{ url: imageUrl }];
+          }
         }
+        
         if (option.deliveryCompany) fields['חברת משלוחים CLAUDE'] = option.deliveryCompany;
         if (option.projectPriceBeforeVAT !== undefined) fields['תמחור לפרויקט לפני מע"מ CLAUDE'] = option.projectPriceBeforeVAT;
         if (option.shippingPriceToClient !== undefined) fields['תמחור משלוח ללקוח CLAUDE'] = option.shippingPriceToClient;
@@ -86,11 +123,18 @@ export async function POST(request: NextRequest) {
           'שם לקוח': quoteData.customerName || '',
           'הוצאות נוספות': option.additionalExpenses || 0,
         };
+        
+        // עדכון מארז ותמונה
         if (option.packageId && isValidRecordId(option.packageId)) {
           fields['שם מארז'] = [option.packageId];
-          // הוספת מספר מארז כדי להפעיל את האוטומציה של התמונה
-          fields['מספר מארז'] = option.packageNumber || '';
+          
+          // משוך תמונה ישירות מהמארז
+          const imageUrl = await fetchPackageImage(option.packageId);
+          if (imageUrl) {
+            fields['תמונת מארז'] = [{ url: imageUrl }];
+          }
         }
+        
         const productIds = option.items?.filter((i: any) => i.type === 'product' && isValidRecordId(i.id)).map((i: any) => i.id) || [];
         const packagingIds = option.items?.filter((i: any) => i.type === 'packaging' && isValidRecordId(i.id)).map((i: any) => i.id) || [];
         if (productIds.length) fields['מוצרים'] = productIds;
