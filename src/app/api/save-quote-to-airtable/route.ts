@@ -53,10 +53,10 @@ export async function POST(request: NextRequest) {
           'מוצרי אריזה ומיתוג copy': option.items?.filter((i: any) => i.type === 'packaging' && isValidRecordId(i.id)).map((i: any) => i.id) || [],
           'הוצאות נוספות': option.additionalExpenses || 0,
         };
+        
         if (option.packageId && isValidRecordId(option.packageId)) fields['שם מארז'] = [option.packageId];
         if (option.shippingCost !== undefined) fields['תמחור משלוח ללקוח'] = option.shippingCost;
         if (option.deliveryCompany) fields['חברת משלוחים'] = option.deliveryCompany;
-        if (option.deliveryBoxesCount) fields['כמות קרטונים להובלה'] = option.deliveryBoxesCount.toString();
 
         console.log(`🔄 מעדכן אופציה ${option.id}`);
         const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${OPTIONS_TABLE}/${option.airtableId}`, {
@@ -104,23 +104,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 3. עדכן הזדמנות מכירה - רק שדות שניתן לעדכן!
+    // 3. עדכן הזדמנות מכירה
     if (quoteData.opportunityId && isValidRecordId(quoteData.opportunityId)) {
       const fields: any = {};
       
-      // פרטי לקוח בסיסיים
       if (quoteData.customerName !== undefined) fields['שם מלא'] = quoteData.customerName;
       if (quoteData.customerEmail !== undefined) fields['Email'] = quoteData.customerEmail;
       if (quoteData.customerPhone !== undefined) fields['טלפון'] = quoteData.customerPhone;
       if (quoteData.customerCompany !== undefined) fields['חברה מקושרת'] = quoteData.customerCompany;
-      
-      // תקציב (רק שדות שאינם מחושבים)
       if (quoteData.packageQuantity !== undefined) fields['כמות מארזים'] = quoteData.packageQuantity;
       if (quoteData.budgetPerPackage !== undefined) fields['תקציב'] = quoteData.budgetPerPackage;
       if (quoteData.includeVAT !== undefined) fields['מחירים כולל מע"מ'] = quoteData.includeVAT;
       if (quoteData.includeShipping !== undefined) fields['תקציב כולל משלוח'] = quoteData.includeShipping;
-      
-      // דגשים ומשלוח
       if (quoteData.customerNotes !== undefined) fields['דגשים מהלקוח'] = quoteData.customerNotes;
       if (quoteData.customerSticker !== undefined) fields['מדבקת לקוח'] = quoteData.customerSticker;
       if (quoteData.customerCard !== undefined) fields['גלוית לקוח'] = quoteData.customerCard;
@@ -129,7 +124,6 @@ export async function POST(request: NextRequest) {
       if (quoteData.deliveryDate !== undefined) fields['תאריך אספקה מבוקש'] = quoteData.deliveryDate;
 
       console.log('🔄 מעדכן הזדמנות מכירה:', quoteData.opportunityId);
-      console.log('📝 שדות שנשלחים:', JSON.stringify(fields, null, 2));
 
       const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${OPPORTUNITIES_TABLE}/${quoteData.opportunityId}`, {
         method: 'PATCH',
@@ -140,13 +134,9 @@ export async function POST(request: NextRequest) {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('❌ שגיאה בעדכון הזדמנות:', errorText);
-        throw new Error(`Failed to update opportunity: ${errorText}`);
       } else {
-        const result = await response.json();
-        console.log('✅ הזדמנות מכירה עודכנה בהצלחה!');
+        console.log('✅ הזדמנות מכירה עודכנה');
       }
-    } else {
-      console.log('⚠️ אין opportunityId - לא מעדכנים הזדמנות');
     }
 
     // 4. עדכן רשימת אופציות בהצעת מחיר
