@@ -55,8 +55,9 @@ export async function POST(request: NextRequest) {
         };
         
         if (option.packageId && isValidRecordId(option.packageId)) fields['שם מארז'] = [option.packageId];
-        if (option.shippingCost !== undefined) fields['תמחור משלוח ללקוח'] = option.shippingCost;
-        if (option.deliveryCompany) fields['חברת משלוחים'] = option.deliveryCompany;
+        if (option.deliveryCompany) fields['חברת משלוחים CLAUDE'] = option.deliveryCompany;
+        if (option.projectPriceBeforeVAT !== undefined) fields['תמחור לפרויקט לפני מע"מ CLAUDE'] = option.projectPriceBeforeVAT;
+        if (option.shippingPriceToClient !== undefined) fields['תמחור משלוח ללקוח CLAUDE'] = option.shippingPriceToClient;
 
         console.log(`🔄 מעדכן אופציה ${option.id}`);
         const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${OPTIONS_TABLE}/${option.airtableId}`, {

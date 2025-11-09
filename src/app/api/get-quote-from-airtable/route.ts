@@ -235,11 +235,16 @@ async function buildOptions(optionsData: any[]) {
         revenueWithoutVAT: option['הכנסה ללא מע"מ'] || 0,
         actualProfit: option['רווח בפועל למארז'] || 0,
         
-        // משלוח
-        shippingCost: option['תמחור משלוח ללקוח'] || 0,
-        includeShipping: option['משלוח'] === 'כן',
-        deliveryCompany: option['חברת משלוחים'] || '',
-        deliveryBoxesCount: option['כמות קרטונים להובלה'] ? parseInt(option['כמות קרטונים להובלה']) : null,
+        // משלוח - 9 שדות
+        deliveryCompany: option['חברת משלוחים CLAUDE'] || '',
+        packaging: option['אריזה CLAUDE'] || '',
+        unitsPerCarton: option['כמות שנכנסת בקרטון CLAUDE'] || null,
+        deliveryBoxesCount: option['כמות קרטונים להובלה CLAUDE'] || null,
+        projectPriceBeforeVAT: option['תמחור לפרויקט לפני מע"מ CLAUDE'] || 0,
+        projectPriceWithVAT: option['תמחור לפרויקט כולל מע"מ CLAUDE'] || 0,
+        projectPriceToClientBeforeVAT: option['תמחור לפרויקט ללקוח לפני מע"מ CLAUDE'] || 0,
+        projectPriceToClientWithVAT: option['תמחור לפרויקט ללקוח כולל מע"מ CLAUDE'] || 0,
+        shippingPriceToClient: option['תמחור משלוח ללקוח CLAUDE'] || 0,
         
         // תמונה
         image: option['תמונת מארז']?.[0]?.url || null,

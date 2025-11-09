@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { QuoteOption } from '@/types';
 import { ChevronDown } from 'lucide-react';
@@ -19,6 +19,48 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
     "הבימה משלוחים",
     "איסוף עצמי"
   ];
+
+  // חישובים אוטומטיים - כמות קרטונים להובלה
+  useEffect(() => {
+    if (option.packageQuantity && option.unitsPerCarton) {
+      const calculated = Math.ceil(option.packageQuantity / option.unitsPerCarton);
+      if (option.deliveryBoxesCount !== calculated) {
+        onUpdate(option.id, { ...option, deliveryBoxesCount: calculated });
+      }
+    }
+  }, [option.packageQuantity, option.unitsPerCarton]);
+
+  // תמחור לפרויקט כולל מע"מ
+  useEffect(() => {
+    if (option.projectPriceBeforeVAT !== undefined) {
+      const calculated = option.projectPriceBeforeVAT * 1.18;
+      if (option.projectPriceWithVAT !== calculated) {
+        onUpdate(option.id, { ...option, projectPriceWithVAT: calculated });
+      }
+    }
+  }, [option.projectPriceBeforeVAT]);
+
+  // תמחור לפרויקט ללקוח לפני מע"מ
+  useEffect(() => {
+    if (option.projectPriceBeforeVAT !== undefined) {
+      const calculated = option.projectPriceBeforeVAT < 600 
+        ? option.projectPriceBeforeVAT * 1.1 
+        : option.projectPriceBeforeVAT;
+      if (option.projectPriceToClientBeforeVAT !== calculated) {
+        onUpdate(option.id, { ...option, projectPriceToClientBeforeVAT: calculated });
+      }
+    }
+  }, [option.projectPriceBeforeVAT]);
+
+  // תמחור לפרויקט ללקוח כולל מע"מ
+  useEffect(() => {
+    if (option.projectPriceToClientBeforeVAT !== undefined) {
+      const calculated = option.projectPriceToClientBeforeVAT * 1.18;
+      if (option.projectPriceToClientWithVAT !== calculated) {
+        onUpdate(option.id, { ...option, projectPriceToClientWithVAT: calculated });
+      }
+    }
+  }, [option.projectPriceToClientBeforeVAT]);
 
   return (
     <div className="bg-purple-50 rounded-lg border border-purple-200 overflow-hidden">
@@ -72,12 +114,12 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-gray-600 mb-1">עלות חברת משלוחים (₪)</label>
+                <label className="block text-xs text-gray-600 mb-1">עלות משלוח מהספק (₪)</label>
                 <Input
                   type="number"
                   step="0.01"
-                  value={option.shippingCompanyCost || ""}
-                  onChange={(e) => onUpdate(option.id, { ...option, shippingCompanyCost: parseFloat(e.target.value) || 0 })}
+                  value={option.projectPriceBeforeVAT || ""}
+                  onChange={(e) => onUpdate(option.id, { ...option, projectPriceBeforeVAT: parseFloat(e.target.value) || 0 })}
                   placeholder="0.00"
                   className="text-sm"
                 />
@@ -89,17 +131,6 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
                   step="0.01"
                   value={option.shippingPriceToClient || ""}
                   onChange={(e) => onUpdate(option.id, { ...option, shippingPriceToClient: parseFloat(e.target.value) || 0 })}
-                  placeholder="0.00"
-                  className="text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-600 mb-1">תמחור לפרויקט לפני מע"מ (₪)</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={option.projectPriceBeforeVAT || ""}
-                  onChange={(e) => onUpdate(option.id, { ...option, projectPriceBeforeVAT: parseFloat(e.target.value) || 0 })}
                   placeholder="0.00"
                   className="text-sm"
                 />
