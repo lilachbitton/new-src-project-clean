@@ -87,12 +87,17 @@ export async function POST(request: NextRequest) {
         
         // עדכון מארז ותמונה
         if (option.packageId && isValidRecordId(option.packageId)) {
+          console.log(`🖼️ מנסה למשוך תמונה למארז ${option.packageId}`);
           fields['שם מארז'] = [option.packageId];
           
           // משוך תמונה ישירות מהמארז
           const imageUrl = await fetchPackageImage(option.packageId);
+          console.log(`🖼️ URL שנמשך:`, imageUrl);
           if (imageUrl) {
             fields['תמונת מארז'] = [{ url: imageUrl }];
+            console.log(`✅ מעדכן תמונה באופציה`);
+          } else {
+            console.log(`⚠️ לא נמצאה תמונה למארז`);
           }
         }
         
@@ -126,12 +131,17 @@ export async function POST(request: NextRequest) {
         
         // עדכון מארז ותמונה
         if (option.packageId && isValidRecordId(option.packageId)) {
+          console.log(`🖼️ [יצירה] מנסה למשוך תמונה למארז ${option.packageId}`);
           fields['שם מארז'] = [option.packageId];
           
           // משוך תמונה ישירות מהמארז
           const imageUrl = await fetchPackageImage(option.packageId);
+          console.log(`🖼️ [יצירה] URL שנמשך:`, imageUrl);
           if (imageUrl) {
             fields['תמונת מארז'] = [{ url: imageUrl }];
+            console.log(`✅ [יצירה] מעדכן תמונה באופציה`);
+          } else {
+            console.log(`⚠️ [יצירה] לא נמצאה תמונה למארז`);
           }
         }
         
