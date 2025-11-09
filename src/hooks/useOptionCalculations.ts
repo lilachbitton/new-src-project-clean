@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { QuoteOption, QuoteData } from '@/types';
 
 export function useOptionCalculations(
@@ -8,6 +8,18 @@ export function useOptionCalculations(
 ) {
   const isCalculatingRef = useRef(false);
 
+  // Track items changes with useMemo
+  const itemsHash = useMemo(() => {
+    return JSON.stringify(
+      option.items.map(i => ({ 
+        id: i.id, 
+        price: i.price, 
+        type: i.type, 
+        name: i.name 
+      }))
+    );
+  }, [option.items]);
+
   useEffect(() => {
     if (isCalculatingRef.current) return;
     if (!option || !quoteData) return;
@@ -16,9 +28,16 @@ export function useOptionCalculations(
     const unitsPerCarton = option.unitsPerCarton || 1;
     const packaging = option.packaging || "";
     
-    // שדות rollup - באים מאיירטייבל
-    const packagingItemsCost = option.packagingItemsCost || 0;
-    const productsCost = option.productsCost || 0;
+    // חישוב עלות מוצרי אריזה
+    const packagingItemsCost = option.items
+      .filter(item => item.type === 'packaging')
+      .reduce((sum, item) => sum + (item.price || 0), 0);
+    
+    // חישוב עלות מוצרים
+    const productsCost = option.items
+      .filter(item => item.type !== 'packaging')
+      .reduce((sum, item) => sum + (item.price || 0), 0);
+    
     const productQuantity = option.items.filter(item => item.type !== 'packaging').length;
 
     const packageQuantity = quoteData.packageQuantity || 1;
@@ -74,6 +93,9 @@ export function useOptionCalculations(
     // הכנסה ללא מע"מ: ({תקציב למארז לפני מע"מ} * {כמות מארזים})+{תמחור לפרויקט ללקוח לפני מע"מ}
     const revenueWithoutVAT = (budgetPerPackage * packageQuantity) + projectPriceToClientBeforeVAT;
 
+    // רווח בפועל למארז
+    const actualProfit = profitPerDeal;
+
     // עדכן
     if (
       option.deliveryBoxesCount !== deliveryBoxesCount ||
@@ -86,7 +108,11 @@ export function useOptionCalculations(
       option.profitPerDeal !== profitPerDeal ||
       option.actualProfitPercentage !== actualProfitPercentage ||
       option.totalDealProfit !== totalDealProfit ||
-      option.revenueWithoutVAT !== revenueWithoutVAT
+      option.revenueWithoutVAT !== revenueWithoutVAT ||
+      option.productQuantity !== productQuantity ||
+      option.packagingItemsCost !== packagingItemsCost ||
+      option.productsCost !== productsCost ||
+      option.actualProfit !== actualProfit
     ) {
       isCalculatingRef.current = true;
       
@@ -105,15 +131,16 @@ export function useOptionCalculations(
         revenueWithoutVAT,
         productQuantity,
         packagingItemsCost,
-        productsCost
+        productsCost,
+        actualProfit
       });
 
       setTimeout(() => {
         isCalculatingRef.current = false;
-      }, 100);
+      }, 0);
     }
   }, [
-    option.items,
+    itemsHash,
     option.additionalExpenses,
     option.profitTarget,
     option.agentCommission,
@@ -121,14 +148,11 @@ export function useOptionCalculations(
     option.unitsPerCarton,
     option.packaging,
     option.projectPriceBeforeVAT,
-    option.packagingItemsCost,
-    option.productsCost,
     quoteData.budgetPerPackage,
     quoteData.packageQuantity,
     quoteData.profitTarget,
     quoteData.agentCommission,
     quoteData.includeShipping,
-    option.id,
-    onUpdate
+    option.id
   ]);
 }
