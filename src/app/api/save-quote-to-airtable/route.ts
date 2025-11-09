@@ -109,20 +109,20 @@ export async function POST(request: NextRequest) {
     if (quoteData.opportunityId && isValidRecordId(quoteData.opportunityId)) {
       const fields: any = {};
       
-      if (quoteData.customerName !== undefined) fields['שם מלא'] = quoteData.customerName;
-      if (quoteData.customerEmail !== undefined) fields['Email'] = quoteData.customerEmail;
-      if (quoteData.customerPhone !== undefined) fields['טלפון'] = quoteData.customerPhone;
-      if (quoteData.customerCompany !== undefined) fields['חברה מקושרת'] = quoteData.customerCompany;
-      if (quoteData.packageQuantity !== undefined) fields['כמות מארזים'] = quoteData.packageQuantity;
-      if (quoteData.budgetPerPackage !== undefined) fields['תקציב'] = quoteData.budgetPerPackage;
+      if (quoteData.customerName) fields['שם מלא'] = quoteData.customerName;
+      if (quoteData.customerEmail) fields['Email'] = quoteData.customerEmail;
+      if (quoteData.customerPhone) fields['טלפון'] = quoteData.customerPhone;
+      if (quoteData.customerCompany) fields['חברה מקושרת'] = quoteData.customerCompany;
+      if (quoteData.packageQuantity !== null && quoteData.packageQuantity !== undefined) fields['כמות מארזים'] = quoteData.packageQuantity;
+      if (quoteData.budgetPerPackage !== null && quoteData.budgetPerPackage !== undefined) fields['תקציב'] = quoteData.budgetPerPackage;
       if (quoteData.includeVAT !== undefined) fields['מחירים כולל מע"מ'] = quoteData.includeVAT;
       if (quoteData.includeShipping !== undefined) fields['תקציב כולל משלוח'] = quoteData.includeShipping;
-      if (quoteData.customerNotes !== undefined) fields['דגשים מהלקוח'] = quoteData.customerNotes;
-      if (quoteData.customerSticker !== undefined) fields['מדבקת לקוח'] = quoteData.customerSticker;
-      if (quoteData.customerCard !== undefined) fields['גלוית לקוח'] = quoteData.customerCard;
-      if (quoteData.preferredPackaging !== undefined) fields['סוג אריזה מועדף'] = quoteData.preferredPackaging;
-      if (quoteData.deliveryAddress !== undefined) fields['כתובת אספקה'] = quoteData.deliveryAddress;
-      if (quoteData.deliveryDate !== undefined) fields['תאריך אספקה מבוקש'] = quoteData.deliveryDate;
+      if (quoteData.customerNotes) fields['דגשים מהלקוח'] = quoteData.customerNotes;
+      if (quoteData.customerSticker) fields['מדבקת לקוח'] = quoteData.customerSticker;
+      if (quoteData.customerCard) fields['גלוית לקוח'] = quoteData.customerCard;
+      if (quoteData.preferredPackaging) fields['סוג אריזה מועדף'] = quoteData.preferredPackaging;
+      if (quoteData.deliveryAddress) fields['כתובת אספקה'] = quoteData.deliveryAddress;
+      if (quoteData.deliveryDate) fields['תאריך אספקה מבוקש'] = quoteData.deliveryDate;
 
       console.log('🔄 מעדכן הזדמנות מכירה:', quoteData.opportunityId);
 
