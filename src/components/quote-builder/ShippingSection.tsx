@@ -36,25 +36,29 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
 
   // תלוי ב-projectPriceBeforeVAT בלבד
   const prevProjectPriceRef = React.useRef(option.projectPriceBeforeVAT);
-  
+
   useEffect(() => {
     // בדוק אם projectPriceBeforeVAT השתנה
     if (option.projectPriceBeforeVAT !== prevProjectPriceRef.current) {
       prevProjectPriceRef.current = option.projectPriceBeforeVAT;
-      
+
       if (option.projectPriceBeforeVAT !== undefined && option.projectPriceBeforeVAT !== null) {
-        const calculated = option.projectPriceBeforeVAT < 600 
+        const calculated = option.projectPriceBeforeVAT < 600
           ? Math.round(option.projectPriceBeforeVAT * 1.1 * 100) / 100
           : option.projectPriceBeforeVAT;
-        
-        onUpdate(option.id, { 
-          ...option, 
+
+        // עדכן את projectPriceToClientBeforeVAT תמיד
+        // עדכן את shippingPriceToClient רק אם הוא ריק
+        const shouldUpdateShippingPrice = !option.shippingPriceToClient || option.shippingPriceToClient === 0;
+
+        onUpdate(option.id, {
+          ...option,
           projectPriceToClientBeforeVAT: calculated,
-          shippingPriceToClient: calculated 
+          ...(shouldUpdateShippingPrice && { shippingPriceToClient: calculated })
         });
       }
     }
-  }, [option.projectPriceBeforeVAT, option.id, onUpdate]);
+  }, [option.projectPriceBeforeVAT, option.shippingPriceToClient, option.id, onUpdate]);
 
   // תמחור לפרויקט ללקוח כולל מע"מ
   useEffect(() => {
