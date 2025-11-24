@@ -6,17 +6,20 @@ export function useOptionCalculations(
   quoteData: QuoteData,
   onUpdate: (optionId: string, updatedOption: QuoteOption) => void
 ) {
-  // Track items changes with useMemo
+  // Track items and package changes with useMemo
   const itemsHash = useMemo(() => {
-    return JSON.stringify(
-      option.items.map(i => ({ 
+    return JSON.stringify({
+      items: option.items.map(i => ({ 
         id: i.id, 
         price: i.price, 
         type: i.type, 
         name: i.name 
-      }))
-    );
-  }, [option.items]);
+      })),
+      packageId: option.packageId,
+      packageNumber: option.packageNumber,
+      image: option.image
+    });
+  }, [option.items, option.packageId, option.packageNumber, option.image]);
 
   useEffect(() => {
     if (!option || !quoteData) return;
@@ -93,7 +96,7 @@ export function useOptionCalculations(
     // רווח בפועל למארז
     const actualProfit = profitPerDeal;
 
-    // עדכן מיד - בלי בדיקת שינויים
+    // עדכן רק אם השתנו הערכים (כולל packageId ו-packageNumber)
     onUpdate(option.id, {
       ...option,
       deliveryBoxesCount,
@@ -110,7 +113,11 @@ export function useOptionCalculations(
       productQuantity,
       packagingItemsCost,
       productsCost,
-      actualProfit
+      actualProfit,
+      // שמור את שדות המארז
+      packageId: option.packageId,
+      packageNumber: option.packageNumber,
+      image: option.image
     });
   }, [
     itemsHash,
