@@ -66,8 +66,8 @@ export function useOptionCalculations(
       : budgetPerPackage;
 
     // מחיר עלות: {תקציב למארז לאחר משלוח}*(1-{יעד רווחיות}-{עמלת סוכן %})
-    const profitTarget = option.profitTarget || quoteData.profitTarget || 0.36;
-    const agentCommission = option.agentCommission || quoteData.agentCommission || 0;
+    const profitTarget = (option.profitTarget || quoteData.profitTarget || 36) / 100; // המרה לערך עשרוני
+    const agentCommission = (option.agentCommission || quoteData.agentCommission || 0) / 100; // המרה לערך עשרוני
     const costPrice = budgetAfterShipping * (1 - profitTarget - agentCommission);
 
     // הובלה במארז

@@ -571,8 +571,8 @@ export function QuoteOptionCard({
                       <label className="block text-xs text-gray-600 mb-1">יעד רווחיות (%)</label>
                       <Input
                         type="number"
-                        value={(option.profitTarget || quoteData.profitTarget || 0.36) * 100}
-                        onChange={(e) => onUpdate(option.id, { ...option, profitTarget: (parseFloat(e.target.value) || 0) / 100 })}
+                        value={option.profitTarget || quoteData.profitTarget || 36}
+                        onChange={(e) => onUpdate(option.id, { ...option, profitTarget: parseFloat(e.target.value) || 0 })}
                         placeholder="36"
                         className="text-sm"
                       />
@@ -590,8 +590,8 @@ export function QuoteOptionCard({
                       <label className="block text-xs text-gray-600 mb-1">עמלת סוכן (%)</label>
                       <Input
                         type="number"
-                        value={(option.agentCommission || quoteData.agentCommission || 0) * 100}
-                        onChange={(e) => onUpdate(option.id, { ...option, agentCommission: (parseFloat(e.target.value) || 0) / 100 })}
+                        value={option.agentCommission || quoteData.agentCommission || 0}
+                        onChange={(e) => onUpdate(option.id, { ...option, agentCommission: parseFloat(e.target.value) || 0 })}
                         placeholder="0"
                         className="text-sm"
                       />
@@ -617,11 +617,11 @@ export function QuoteOptionCard({
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <span className="text-gray-600">יעד רווחיות:</span>
-                      <span className="font-semibold">{((option.profitTarget || quoteData.profitTarget || 0.36) * 100).toFixed(0)}%</span>
+                      <span className="font-semibold">{option.profitTarget || quoteData.profitTarget || 36}%</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <span className="text-gray-600">עמלת סוכן %:</span>
-                      <span className="font-semibold">{((option.agentCommission || quoteData.agentCommission || 0) * 100).toFixed(0)}%</span>
+                      <span className="font-semibold">{option.agentCommission || quoteData.agentCommission || 0}%</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <span className="text-gray-600">מחיר עלות:</span>

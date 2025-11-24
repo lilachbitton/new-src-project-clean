@@ -90,8 +90,8 @@ export async function POST(request: NextRequest) {
           'מוצרי אריזה ומיתוג copy': option.items?.filter((i: any) => i.type === 'packaging' && isValidRecordId(i.id)).map((i: any) => i.id) || [],
           'הוצאות נוספות': option.additionalExpenses || 0,
           // הוסף יעד רווחיות ועמלת סוכן
-          'יעד רווחיות': option.profitTarget ? option.profitTarget * 100 : null, // המרה לאחוזים לאיירטייבל
-          'עמלת סוכן %': option.agentCommission ? option.agentCommission * 100 : null, // המרה לאחוזים לאיירטייבל
+          'יעד רווחיות': option.profitTarget || null, // שמירה ישירה כאחוזים (36)
+          'עמלת סוכן %': option.agentCommission || null, // שמירה ישירה כאחוזים (10)
           'סוכן': option.agent || null,
         };
         
@@ -147,8 +147,8 @@ export async function POST(request: NextRequest) {
           'שם לקוח': quoteData.customerName || '',
           'הוצאות נוספות': option.additionalExpenses || 0,
           // הוסף יעד רווחיות ועמלת סוכן
-          'יעד רווחיות': option.profitTarget ? option.profitTarget * 100 : null, // המרה לאחוזים לאיירטייבל
-          'עמלת סוכן %': option.agentCommission ? option.agentCommission * 100 : null, // המרה לאחוזים לאיירטייבל
+          'יעד רווחיות': option.profitTarget || null, // שמירה ישירה כאחוזים (36)
+          'עמלת סוכן %': option.agentCommission || null, // שמירה ישירה כאחוזים (10)
           'סוכן': option.agent || null,
         };
         
