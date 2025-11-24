@@ -6,7 +6,7 @@ const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
 const QUOTES_TABLE = 'tbl9d2UhyRrNVjGxW';
 const OPTIONS_TABLE = 'tblkRYwCcYfEG6iAO';
 const OPPORTUNITIES_TABLE = 'tbl4fGlUM8KCbCS0R';
-const PACKAGES_TABLE = 'tblEryHPd3zukaV99';
+const PACKAGES_TABLE = 'tblS3sVyCau1AcEgK'; // טבלת מארזים
 
 function isValidRecordId(id: string): boolean {
   return /^rec[a-zA-Z0-9]{14}$/.test(id);
@@ -29,7 +29,13 @@ async function fetchPackageImage(packageId: string): Promise<string | null> {
     }
     
     const packageData = await response.json();
-    const imageUrl = packageData.fields['תמונת מארז']?.[0]?.url;
+    console.log(`🔍 שדות המארז:`, Object.keys(packageData.fields));
+    console.log(`🔍 Attachments קיים:`, !!packageData.fields['Attachments']);
+    
+    // נסה כמה אפשרויות לשם השדה של התמונה
+    const imageUrl = packageData.fields['Attachments']?.[0]?.url || 
+                     packageData.fields['תמונת מארז']?.[0]?.url ||
+                     packageData.fields['תמונה']?.[0]?.url;
     
     if (imageUrl) {
       console.log(`✅ נמצאה תמונה למארז ${packageId}`);
@@ -85,10 +91,22 @@ export async function POST(request: NextRequest) {
           'הוצאות נוספות': option.additionalExpenses || 0,
         };
         
-        // עדכון מארז ומספר מארז
+        // עדכון מארז, תמונה ומספר מארז
         if (option.packageId && isValidRecordId(option.packageId)) {
           console.log(`📦 מעדכן מארז ${option.packageId}`);
           fields['שם מארז'] = [option.packageId];
+          
+          // משוך תמונה ישירות מהמארז
+          const imageUrl = await fetchPackageImage(option.packageId);
+          console.log(`🖼️ URL שנמשך:`, imageUrl);
+          if (imageUrl) {
+            // שימוש בפורמט הנכון ל-Airtable attachment field
+            fields['תמונת מארז'] = [{ url: imageUrl }];
+            console.log(`✅ מעדכן תמונה באופציה - URL: ${imageUrl}`);
+            console.log(`✅ שדה תמונת מארז שנשמר:`, JSON.stringify(fields['תמונת מארז']));
+          } else {
+            console.log(`⚠️ לא נמצאה תמונה למארז ${option.packageId}`);
+          }
           
           // הוסף מספר מארז אם קיים
           if (option.packageNumber) {
@@ -102,6 +120,7 @@ export async function POST(request: NextRequest) {
         if (option.shippingPriceToClient !== undefined) fields['תמחור משלוח ללקוח CLAUDE'] = option.shippingPriceToClient;
 
         console.log(`🔄 מעדכן אופציה ${option.id}`);
+        console.log(`📝 שדות שנשלחים לאיירטייבל:`, JSON.stringify(fields, null, 2));
         const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${OPTIONS_TABLE}/${option.airtableId}`, {
           method: 'PATCH',
           headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, 'Content-Type': 'application/json' },
@@ -125,12 +144,21 @@ export async function POST(request: NextRequest) {
           'הוצאות נוספות': option.additionalExpenses || 0,
         };
         
-        // עדכון מארז ומספר מארז
+        // עדכון מארז, תמונה ומספר מארז
         if (option.packageId && isValidRecordId(option.packageId)) {
           console.log(`📦 [יצירה] מעדכן מארז ${option.packageId}`);
           fields['שם מארז'] = [option.packageId];
           
-          // הוסף מספר מארז אם קיים  
+          // משוך תמונה ישירות מהמארז
+          const imageUrl = await fetchPackageImage(option.packageId);
+          console.log(`🖼️ [יצירה] URL שנמשך:`, imageUrl);
+          if (imageUrl) {
+            fields['תמונת מארז'] = [{ url: imageUrl }];
+            console.log(`✅ [יצירה] מעדכן תמונה באופציה - URL: ${imageUrl}`);
+            console.log(`✅ [יצירה] שדה תמונת מארז:`, JSON.stringify(fields['תמונת מארז']));
+          }
+          
+          // הוסף מספר מארז אם קיים
           if (option.packageNumber) {
             fields['מספר מארז'] = option.packageNumber;
             console.log(`✅ [יצירה] מעדכן מספר מארז: ${option.packageNumber}`);
