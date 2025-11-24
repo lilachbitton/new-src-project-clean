@@ -146,8 +146,8 @@ export async function GET(request: NextRequest) {
       includeShipping: opportunityData?.['תקציב כולל משלוח'] || false,
       
       // רווחיות
-      profitTarget: 36,
-      agentCommission: (fields['עמלת סוכן'] || 0) * 100, // המרה ל-%
+      profitTarget: 0.36, // 36% כערך עשרוני
+      agentCommission: (fields['עמלת סוכן'] || 0), // כבר באחוזים
       agent: fields['סוכן'] || opportunityData?.['סוכן'] || null,
       
       // פרטים נוספים
@@ -264,9 +264,9 @@ async function buildOptions(optionsData: any[]) {
         
         // חישובים - כל השדות מאיירטייבל
         total: (option['תמחור לפרויקט לפני מע"מ'] || 0) * 1.18,
-        profitTarget: option['יעד רווחיות'] || null,
+        profitTarget: option['יעד רווחיות'] ? option['יעד רווחיות'] / 100 : null, // חלק ב-100 כי מגיע כ-36 וצריך 0.36
         agent: safeValue(option['סוכן']),
-        agentCommission: option['עמלת סוכן %'] || null,
+        agentCommission: option['עמלת סוכן %'] ? option['עמלת סוכן %'] / 100 : null, // חלק ב-100 כי מגיע כאחוזים
         costPrice: option['מחיר עלות'] || 0,
         additionalExpenses: option['הוצאות נוספות'] || 0,
         packagingWorkCost: option['עלות עבודת אריזה'] || 0,

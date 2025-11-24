@@ -89,6 +89,10 @@ export async function POST(request: NextRequest) {
           'מוצרים': option.items?.filter((i: any) => i.type === 'product' && isValidRecordId(i.id)).map((i: any) => i.id) || [],
           'מוצרי אריזה ומיתוג copy': option.items?.filter((i: any) => i.type === 'packaging' && isValidRecordId(i.id)).map((i: any) => i.id) || [],
           'הוצאות נוספות': option.additionalExpenses || 0,
+          // הוסף יעד רווחיות ועמלת סוכן
+          'יעד רווחיות': option.profitTarget ? option.profitTarget * 100 : null, // המרה לאחוזים לאיירטייבל
+          'עמלת סוכן %': option.agentCommission ? option.agentCommission * 100 : null, // המרה לאחוזים לאיירטייבל
+          'סוכן': option.agent || null,
         };
         
         // עדכון מארז, תמונה ומספר מארז
@@ -142,6 +146,10 @@ export async function POST(request: NextRequest) {
           'כותרת אופציה': option.title || `אופציה ${option.id}`,
           'שם לקוח': quoteData.customerName || '',
           'הוצאות נוספות': option.additionalExpenses || 0,
+          // הוסף יעד רווחיות ועמלת סוכן
+          'יעד רווחיות': option.profitTarget ? option.profitTarget * 100 : null, // המרה לאחוזים לאיירטייבל
+          'עמלת סוכן %': option.agentCommission ? option.agentCommission * 100 : null, // המרה לאחוזים לאיירטייבל
+          'סוכן': option.agent || null,
         };
         
         // עדכון מארז, תמונה ומספר מארז

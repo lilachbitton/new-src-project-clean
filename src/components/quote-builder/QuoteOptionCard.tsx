@@ -641,7 +641,9 @@ export function QuoteOptionCard({
                     </div>
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <span className="text-gray-600">תקציב נותר למוצרים:</span>
-                      <span className="font-semibold">₪{(option.budgetRemainingForProducts || 0).toFixed(2)}</span>
+                      <span className={`font-semibold ${(option.budgetRemainingForProducts || 0) < 0 ? 'text-red-600' : ''}`}>
+                        {(option.budgetRemainingForProducts || 0) < 0 ? '-' : ''}₪{Math.abs(option.budgetRemainingForProducts || 0).toFixed(2)}
+                      </span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <span className="text-gray-600">כמות מוצרים:</span>
@@ -649,15 +651,21 @@ export function QuoteOptionCard({
                     </div>
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <span className="text-gray-600">% רווח בפועל למארז:</span>
-                      <span className="font-semibold text-green-600">{((option.actualProfitPercentage || 0) * 100).toFixed(2)}%</span>
+                      <span className={`font-semibold ${(option.actualProfitPercentage || 0) < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                        {(option.actualProfitPercentage || 0) < 0 ? '-' : ''}{Math.abs((option.actualProfitPercentage || 0) * 100).toFixed(2)}%
+                      </span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-green-100">
                       <span className="text-gray-700 font-medium">רווח לעסקה בשקלים:</span>
-                      <span className="font-bold text-green-700">₪{(option.profitPerDeal || 0).toFixed(2)}</span>
+                      <span className={`font-bold ${(option.profitPerDeal || 0) < 0 ? 'text-red-700' : 'text-green-700'}`}>
+                        {(option.profitPerDeal || 0) < 0 ? '-' : ''}₪{Math.abs(option.profitPerDeal || 0).toFixed(2)}
+                      </span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-green-100">
                       <span className="text-gray-700 font-medium">סה"כ רווח לעסקה:</span>
-                      <span className="font-bold text-green-700">₪{(option.totalDealProfit || 0).toFixed(2)}</span>
+                      <span className={`font-bold ${(option.totalDealProfit || 0) < 0 ? 'text-red-700' : 'text-green-700'}`}>
+                        {(option.totalDealProfit || 0) < 0 ? '-' : ''}₪{Math.abs(option.totalDealProfit || 0).toFixed(2)}
+                      </span>
                     </div>
                     <div className="flex justify-between py-1">
                       <span className="text-gray-700 font-medium">הכנסה ללא מע"מ:</span>
