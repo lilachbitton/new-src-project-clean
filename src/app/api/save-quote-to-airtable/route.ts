@@ -89,11 +89,20 @@ export async function POST(request: NextRequest) {
           'מוצרים': option.items?.filter((i: any) => i.type === 'product' && isValidRecordId(i.id)).map((i: any) => i.id) || [],
           'מוצרי אריזה ומיתוג copy': option.items?.filter((i: any) => i.type === 'packaging' && isValidRecordId(i.id)).map((i: any) => i.id) || [],
           'הוצאות נוספות': option.additionalExpenses || 0,
-          // הוסף יעד רווחיות ועמלת סוכן
-          'יעד רווחיות': option.profitTarget || null, // שמירה ישירה כאחוזים (36)
-          'עמלת סוכן %': option.agentCommission || null, // שמירה ישירה כאחוזים (10)
-          'סוכן': option.agent || null,
         };
+        
+        // הוסף יעד רווחיות ועמלת סוכן רק אם הם קיימים
+        if (option.profitTarget !== null && option.profitTarget !== undefined) {
+          console.log('📈 שומר יעד רווחיות:', option.profitTarget);
+          fields['יעד רווחיות'] = option.profitTarget;
+        }
+        if (option.agentCommission !== null && option.agentCommission !== undefined) {
+          console.log('💵 שומר עמלת סוכן:', option.agentCommission);
+          fields['עמלת סוכן %'] = option.agentCommission;
+        }
+        if (option.agent) {
+          fields['סוכן'] = option.agent;
+        }
         
         // עדכון מארז, תמונה ומספר מארז
         if (option.packageId && isValidRecordId(option.packageId)) {
@@ -146,11 +155,20 @@ export async function POST(request: NextRequest) {
           'כותרת אופציה': option.title || `אופציה ${option.id}`,
           'שם לקוח': quoteData.customerName || '',
           'הוצאות נוספות': option.additionalExpenses || 0,
-          // הוסף יעד רווחיות ועמלת סוכן
-          'יעד רווחיות': option.profitTarget || null, // שמירה ישירה כאחוזים (36)
-          'עמלת סוכן %': option.agentCommission || null, // שמירה ישירה כאחוזים (10)
-          'סוכן': option.agent || null,
         };
+        
+        // הוסף יעד רווחיות ועמלת סוכן רק אם הם קיימים
+        if (option.profitTarget !== null && option.profitTarget !== undefined) {
+          console.log('[CREATE] 📈 שומר יעד רווחיות:', option.profitTarget);
+          fields['יעד רווחיות'] = option.profitTarget;
+        }
+        if (option.agentCommission !== null && option.agentCommission !== undefined) {
+          console.log('[CREATE] 💵 שומר עמלת סוכן:', option.agentCommission);
+          fields['עמלת סוכן %'] = option.agentCommission;
+        }
+        if (option.agent) {
+          fields['סוכן'] = option.agent;
+        }
         
         // עדכון מארז, תמונה ומספר מארז
         if (option.packageId && isValidRecordId(option.packageId)) {

@@ -96,7 +96,7 @@ export function useOptionCalculations(
     // רווח בפועל למארז
     const actualProfit = profitPerDeal;
 
-    // עדכן רק שדות חישוביים, לא לדרוס שדות של המארז
+    // עדכן רק שדות חישוביים, לא לדרוס שדות של המארז או ערכי קלט
     const calculatedFields = {
       deliveryBoxesCount,
       projectPriceWithVAT,
@@ -113,6 +113,7 @@ export function useOptionCalculations(
       packagingItemsCost,
       productsCost,
       actualProfit
+      // לא כוללים profitTarget ו-agentCommission - אלה שדות קלט!
     };
 
     // עדכן רק את השדות המחושבים, לא את שדות המארז
