@@ -129,6 +129,7 @@ export interface Product {
 export interface Package {
   id: string;
   name: string;
+  packageNumber?: string | null;
   packagePrice?: number;
   items: Product[];
   packagingItems?: Product[];

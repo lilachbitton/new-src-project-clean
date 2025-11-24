@@ -141,6 +141,7 @@ export async function fetchActivePackages(): Promise<Package[]> {
         const packageData = {
           id: record.id,
           name: record.get('שם') as string || 'מארז ללא שם',
+          packageNumber: record.get('מספר מארז') as string || null, // הוסף מספר מארז
           packagePrice: Number(record.get('מחיר בש"ח')) || 0,
           items,
           packagingItems,

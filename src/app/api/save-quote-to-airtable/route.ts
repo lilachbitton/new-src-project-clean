@@ -85,19 +85,15 @@ export async function POST(request: NextRequest) {
           'הוצאות נוספות': option.additionalExpenses || 0,
         };
         
-        // עדכון מארז ותמונה
+        // עדכון מארז ומספר מארז
         if (option.packageId && isValidRecordId(option.packageId)) {
-          console.log(`🖼️ מנסה למשוך תמונה למארז ${option.packageId}`);
+          console.log(`📦 מעדכן מארז ${option.packageId}`);
           fields['שם מארז'] = [option.packageId];
           
-          // משוך תמונה ישירות מהמארז
-          const imageUrl = await fetchPackageImage(option.packageId);
-          console.log(`🖼️ URL שנמשך:`, imageUrl);
-          if (imageUrl) {
-            fields['תמונת מארז'] = [{ url: imageUrl }];
-            console.log(`✅ מעדכן תמונה באופציה`);
-          } else {
-            console.log(`⚠️ לא נמצאה תמונה למארז`);
+          // הוסף מספר מארז אם קיים
+          if (option.packageNumber) {
+            fields['מספר מארז'] = option.packageNumber;
+            console.log(`✅ מעדכן מספר מארז: ${option.packageNumber}`);
           }
         }
         
@@ -129,19 +125,15 @@ export async function POST(request: NextRequest) {
           'הוצאות נוספות': option.additionalExpenses || 0,
         };
         
-        // עדכון מארז ותמונה
+        // עדכון מארז ומספר מארז
         if (option.packageId && isValidRecordId(option.packageId)) {
-          console.log(`🖼️ [יצירה] מנסה למשוך תמונה למארז ${option.packageId}`);
+          console.log(`📦 [יצירה] מעדכן מארז ${option.packageId}`);
           fields['שם מארז'] = [option.packageId];
           
-          // משוך תמונה ישירות מהמארז
-          const imageUrl = await fetchPackageImage(option.packageId);
-          console.log(`🖼️ [יצירה] URL שנמשך:`, imageUrl);
-          if (imageUrl) {
-            fields['תמונת מארז'] = [{ url: imageUrl }];
-            console.log(`✅ [יצירה] מעדכן תמונה באופציה`);
-          } else {
-            console.log(`⚠️ [יצירה] לא נמצאה תמונה למארז`);
+          // הוסף מספר מארז אם קיים  
+          if (option.packageNumber) {
+            fields['מספר מארז'] = option.packageNumber;
+            console.log(`✅ [יצירה] מעדכן מספר מארז: ${option.packageNumber}`);
           }
         }
         
