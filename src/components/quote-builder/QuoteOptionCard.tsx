@@ -420,6 +420,26 @@ export function QuoteOptionCard({
               </div>
             )}
             
+            {/* Package Info - מספר מארז ו-packageId */}
+            {(option.packageNumber || option.packageId) && (
+              <div className="bg-purple-50 p-3 rounded-lg border border-purple-200 mb-4">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  {option.packageNumber && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">מספר מארז:</span>
+                      <span className="font-semibold text-purple-700">{option.packageNumber}</span>
+                    </div>
+                  )}
+                  {option.packageId && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">ID מארז:</span>
+                      <span className="font-semibold text-purple-700">{option.packageId}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
             {/* Packaging Items Section */}
             {packagingItems.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm mb-6">
