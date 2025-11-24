@@ -91,14 +91,16 @@ export async function POST(request: NextRequest) {
           'הוצאות נוספות': option.additionalExpenses || 0,
         };
         
-        // הוסף יעד רווחיות ועמלת סוכן רק אם הם קיימים
+        // הוסף יעד רווחיות ועמלת סוכן רק אם הם קיימים - עם המרה מאחוזים לעשרוני
         if (option.profitTarget !== null && option.profitTarget !== undefined) {
-          console.log('📈 שומר יעד רווחיות:', option.profitTarget);
-          fields['יעד רווחיות'] = option.profitTarget;
+          const profitAsDecimal = option.profitTarget / 100; // המרה מאחוזים לעשרוני (36 → 0.36)
+          console.log('📈 שומר יעד רווחיות:', option.profitTarget, '→', profitAsDecimal);
+          fields['יעד רווחיות'] = profitAsDecimal;
         }
         if (option.agentCommission !== null && option.agentCommission !== undefined) {
-          console.log('💵 שומר עמלת סוכן:', option.agentCommission);
-          fields['עמלת סוכן %'] = option.agentCommission;
+          const commissionAsDecimal = option.agentCommission / 100; // המרה מאחוזים לעשרוני (10 → 0.10)
+          console.log('💵 שומר עמלת סוכן:', option.agentCommission, '→', commissionAsDecimal);
+          fields['עמלת סוכן %'] = commissionAsDecimal;
         }
         if (option.agent) {
           fields['סוכן'] = option.agent;
@@ -157,14 +159,16 @@ export async function POST(request: NextRequest) {
           'הוצאות נוספות': option.additionalExpenses || 0,
         };
         
-        // הוסף יעד רווחיות ועמלת סוכן רק אם הם קיימים
+        // הוסף יעד רווחיות ועמלת סוכן רק אם הם קיימים - עם המרה מאחוזים לעשרוני
         if (option.profitTarget !== null && option.profitTarget !== undefined) {
-          console.log('[CREATE] 📈 שומר יעד רווחיות:', option.profitTarget);
-          fields['יעד רווחיות'] = option.profitTarget;
+          const profitAsDecimal = option.profitTarget / 100; // המרה מאחוזים לעשרוני (36 → 0.36)
+          console.log('[CREATE] 📈 שומר יעד רווחיות:', option.profitTarget, '→', profitAsDecimal);
+          fields['יעד רווחיות'] = profitAsDecimal;
         }
         if (option.agentCommission !== null && option.agentCommission !== undefined) {
-          console.log('[CREATE] 💵 שומר עמלת סוכן:', option.agentCommission);
-          fields['עמלת סוכן %'] = option.agentCommission;
+          const commissionAsDecimal = option.agentCommission / 100; // המרה מאחוזים לעשרוני (10 → 0.10)
+          console.log('[CREATE] 💵 שומר עמלת סוכן:', option.agentCommission, '→', commissionAsDecimal);
+          fields['עמלת סוכן %'] = commissionAsDecimal;
         }
         if (option.agent) {
           fields['סוכן'] = option.agent;

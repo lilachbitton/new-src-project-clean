@@ -147,7 +147,7 @@ export async function GET(request: NextRequest) {
       
       // רווחיות
       profitTarget: 36, // 36% כברירת מחדל
-      agentCommission: fields['עמלת סוכן'] || 0, // כבר באחוזים
+      agentCommission: (fields['עמלת סוכן'] || 0) * 100, // המרה מעשרוני לאחוזים (0.10 → 10)
       agent: fields['סוכן'] || opportunityData?.['סוכן'] || null,
       
       // פרטים נוספים
@@ -264,9 +264,9 @@ async function buildOptions(optionsData: any[]) {
         
         // חישובים - כל השדות מאיירטייבל
         total: (option['תמחור לפרויקט לפני מע"מ'] || 0) * 1.18,
-        profitTarget: option['יעד רווחיות'] || null, // לא לחלק! נשאר כמו שהוא (36)
+        profitTarget: (option['יעד רווחיות'] || 0) * 100, // המרה מעשרוני לאחוזים (0.36 → 36)
         agent: safeValue(option['סוכן']),
-        agentCommission: option['עמלת סוכן %'] || null, // לא לחלק! נשאר כמו שהוא (10)
+        agentCommission: (option['עמלת סוכן %'] || 0) * 100, // המרה מעשרוני לאחוזים (0.10 → 10)
         costPrice: option['מחיר עלות'] || 0,
         additionalExpenses: option['הוצאות נוספות'] || 0,
         packagingWorkCost: option['עלות עבודת אריזה'] || 0,
