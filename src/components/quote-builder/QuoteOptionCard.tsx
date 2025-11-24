@@ -39,6 +39,13 @@ export function QuoteOptionCard({
   const [dragOverItem, setDragOverItem] = useState<string | null>(null);
   const [showRowActions, setShowRowActions] = useState<string | null>(null);
 
+  // Debug log לראות את השדות
+  console.log(`🔍 Option ${option.id} state:`, {
+    packageId: option.packageId,
+    packageNumber: option.packageNumber,
+    hasImage: !!option.image
+  });
+
   // שימוש ב-hook לחישובים אוטומטיים
   useOptionCalculations(option, quoteData, onUpdate);
 
@@ -86,6 +93,12 @@ export function QuoteOptionCard({
             productType: item.productType || "",
             isEditable: true,
           })) : [];
+
+        console.log('🎁 מעדכן אופציה עם מארז:', {
+          packageId: itemData.id,
+          packageNumber: itemData.packageNumber,
+          imageUrl: itemData.imageUrl
+        });
 
         onUpdate(option.id, {
           ...option,

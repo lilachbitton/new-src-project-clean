@@ -96,9 +96,8 @@ export function useOptionCalculations(
     // רווח בפועל למארז
     const actualProfit = profitPerDeal;
 
-    // עדכן רק אם השתנו הערכים (כולל packageId ו-packageNumber)
-    onUpdate(option.id, {
-      ...option,
+    // עדכן רק שדות חישוביים, לא לדרוס שדות של המארז
+    const calculatedFields = {
       deliveryBoxesCount,
       projectPriceWithVAT,
       projectPriceToClientBeforeVAT,
@@ -113,11 +112,13 @@ export function useOptionCalculations(
       productQuantity,
       packagingItemsCost,
       productsCost,
-      actualProfit,
-      // שמור את שדות המארז
-      packageId: option.packageId,
-      packageNumber: option.packageNumber,
-      image: option.image
+      actualProfit
+    };
+
+    // עדכן רק את השדות המחושבים, לא את שדות המארז
+    onUpdate(option.id, {
+      ...option,
+      ...calculatedFields
     });
   }, [
     itemsHash,
