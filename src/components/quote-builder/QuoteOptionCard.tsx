@@ -39,13 +39,6 @@ export function QuoteOptionCard({
   const [dragOverItem, setDragOverItem] = useState<string | null>(null);
   const [showRowActions, setShowRowActions] = useState<string | null>(null);
 
-  // Debug log לראות את השדות
-  console.log(`🔍 Option ${option.id} state:`, {
-    packageId: option.packageId,
-    packageNumber: option.packageNumber,
-    hasImage: !!option.image
-  });
-
   // שימוש ב-hook לחישובים אוטומטיים
   useOptionCalculations(option, quoteData, onUpdate);
 
@@ -94,20 +87,40 @@ export function QuoteOptionCard({
             isEditable: true,
           })) : [];
 
+        // מצא את מוצר האריזה מתוך המארז
+        let packagingName = '';
+        let unitsPerCarton = null;
+        
+        if (itemData.packagingItems) {
+          const packagingItem = itemData.packagingItems.find((item: any) => 
+            item.productType?.toLowerCase() === 'אריזה'
+          );
+          
+          if (packagingItem) {
+            packagingName = packagingItem.marketingDescription || packagingItem.name || '';
+            unitsPerCarton = packagingItem.boxesPerCarton || null;
+            console.log('📦 נמצא מוצר אריזה:', packagingName, 'כמות בקרטון:', unitsPerCarton);
+          }
+        }
+
         console.log('🎁 מעדכן אופציה עם מארז:', {
           packageId: itemData.id,
           packageNumber: itemData.packageNumber,
-          imageUrl: itemData.imageUrl
+          imageUrl: itemData.imageUrl,
+          packaging: packagingName,
+          unitsPerCarton
         });
 
         onUpdate(option.id, {
           ...option,
-          packageId: itemData.id, // שמור את ID המארז!
-          packageNumber: itemData.packageNumber || null, // מספר המארז להפעלת אוטומציה
+          packageId: itemData.id,
+          packageNumber: itemData.packageNumber || null,
           title: itemData.name,
           items: [...regularItems, ...packagingItems],
           total: itemData.packagePrice || 0,
           image: itemData.imageUrl || null,
+          packaging: packagingName, // הוסף את שם האריזה
+          unitsPerCarton: unitsPerCarton, // הוסף כמות בקרטון
         });
       } else {
         // Handle single product drop
@@ -433,8 +446,8 @@ export function QuoteOptionCard({
               </div>
             )}
             
-            {/* Package Info - מספר מארז ו-packageId */}
-            {(option.packageNumber || option.packageId) && (
+            {/* Package Info - מספר מארז, אריזה וכמות בקרטון */}
+            {(option.packageNumber || option.packageId || option.packaging || option.unitsPerCarton) && (
               <div className="bg-purple-50 p-3 rounded-lg border border-purple-200 mb-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   {option.packageNumber && (
@@ -447,6 +460,18 @@ export function QuoteOptionCard({
                     <div className="flex justify-between">
                       <span className="text-gray-600">ID מארז:</span>
                       <span className="font-semibold text-purple-700">{option.packageId}</span>
+                    </div>
+                  )}
+                  {option.packaging && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">אריזה:</span>
+                      <span className="font-semibold text-purple-700">{option.packaging}</span>
+                    </div>
+                  )}
+                  {option.unitsPerCarton && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">כמות בקרטון:</span>
+                      <span className="font-semibold text-purple-700">{option.unitsPerCarton}</span>
                     </div>
                   )}
                 </div>
