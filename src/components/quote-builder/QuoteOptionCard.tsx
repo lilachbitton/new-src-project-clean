@@ -571,7 +571,7 @@ export function QuoteOptionCard({
                       <label className="block text-xs text-gray-600 mb-1">יעד רווחיות (%)</label>
                       <Input
                         type="number"
-                        value={(option.profitTarget || quoteData.profitTarget || 36) * 100}
+                        value={(option.profitTarget || quoteData.profitTarget || 0.36) * 100}
                         onChange={(e) => onUpdate(option.id, { ...option, profitTarget: (parseFloat(e.target.value) || 0) / 100 })}
                         placeholder="36"
                         className="text-sm"

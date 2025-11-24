@@ -147,7 +147,7 @@ export async function GET(request: NextRequest) {
       
       // רווחיות
       profitTarget: 0.36, // 36% כערך עשרוני
-      agentCommission: (fields['עמלת סוכן'] || 0), // כבר באחוזים
+      agentCommission: (fields['עמלת סוכן'] || 0) / 100, // חלק ב-100 כי מגיע כאחוזים
       agent: fields['סוכן'] || opportunityData?.['סוכן'] || null,
       
       // פרטים נוספים
