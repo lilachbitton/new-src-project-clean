@@ -21,10 +21,10 @@ export function useQuoteData(initialData?: QuoteData | null) {
     } : null);
   }, [quoteData]);
 
-  const updateBudgetBeforeVAT = useCallback((value: number | null) => {
+  const updateBudgetBeforeVAT = useCallback((value: number | undefined) => {
     if (!quoteData) return;
     
-    const withVAT = value ? parseFloat((value * 1.18).toFixed(2)) : null;
+    const withVAT = value ? parseFloat((value * 1.18).toFixed(2)) : undefined;
     setQuoteData(prev => prev ? {
       ...prev,
       budgetBeforeVAT: value,
@@ -32,10 +32,10 @@ export function useQuoteData(initialData?: QuoteData | null) {
     } : null);
   }, [quoteData]);
 
-  const updateBudgetWithVAT = useCallback((value: number | null) => {
+  const updateBudgetWithVAT = useCallback((value: number | undefined) => {
     if (!quoteData) return;
     
-    const beforeVAT = value ? parseFloat((value / 1.18).toFixed(2)) : null;
+    const beforeVAT = value ? parseFloat((value / 1.18).toFixed(2)) : undefined;
     setQuoteData(prev => prev ? {
       ...prev,
       budgetWithVAT: value,
@@ -200,9 +200,9 @@ export function useQuoteData(initialData?: QuoteData | null) {
       customerName: '',
       customerEmail: '',
       customerPhone: '',
-      budgetBeforeVAT: null,
-      budgetWithVAT: null,
-      packageQuantity: null,
+      budgetBeforeVAT: undefined,
+      budgetWithVAT: undefined,
+      packageQuantity: undefined,
       profitTarget: 36,
       agentCommission: 0,
       options: [{
