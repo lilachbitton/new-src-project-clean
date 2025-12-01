@@ -76,7 +76,7 @@ export function QuoteOptionCard({
           price: item.price || 0,
           type: "product" as const,
           productType: item.productType || "",
-          isEditable: true,
+          isEditable: false,
         }));
 
         const packagingItems = itemData.packagingItems ? 
@@ -87,7 +87,7 @@ export function QuoteOptionCard({
             price: item.price || 0,
             type: "packaging" as const,
             productType: item.productType || "",
-            isEditable: true,
+            isEditable: false,
           })) : [];
 
         let packagingName = '';
@@ -125,7 +125,7 @@ export function QuoteOptionCard({
             itemData.productType?.includes(t)
           ) ? "packaging" : "product",
           productType: itemData.productType || "",
-          isEditable: true,
+          isEditable: false,
         };
 
         const updatedItems = [...option.items, newItem];
