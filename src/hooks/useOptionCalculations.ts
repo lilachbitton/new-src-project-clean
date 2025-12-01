@@ -133,9 +133,14 @@ export function useOptionCalculations(
       recommendedAdditionalExpenses = 33;
     }
     
-    // עדכן הוצאות נוספות רק אם לא הוזן ידנית או שווה לערך הקודם המומלץ
+    // עדכן הוצאות נוספות:
+    // - אם השדה ריק (0) או
+    // - אם השדה שווה לאחד מהערכים האוטומטיים (8, 16, 21, 25, 29, 33)
+    // אז עדכן לערך המומלץ החדש
     const currentAdditionalExpenses = option.additionalExpenses || 0;
-    const additionalExpenses = currentAdditionalExpenses === 0 ? recommendedAdditionalExpenses : currentAdditionalExpenses;
+    const autoValues = [0, 8, 16, 21, 25, 29, 33];
+    const isAutoValue = autoValues.includes(currentAdditionalExpenses);
+    const additionalExpenses = isAutoValue ? recommendedAdditionalExpenses : currentAdditionalExpenses;
     
     // מחיר עלות: {תקציב למארז}*(1-{יעד רווחיות}-{עמלת סוכן %})
     // שים לב: לא מורידים משלוח כאן!
