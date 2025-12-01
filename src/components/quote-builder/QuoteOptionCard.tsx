@@ -438,12 +438,15 @@ export function QuoteOptionCard({
             {/* שורה ראשונה */}
             <div className="bg-white p-2 rounded border border-blue-200">
               <div className="text-gray-600 text-xs mb-1">יעד ריווחיות:</div>
-              <Input
-                type="number"
-                value={option.profitTarget || quoteData.profitTarget || 36}
-                onChange={(e) => onUpdate(option.id, { ...option, profitTarget: parseFloat(e.target.value) || 0 })}
-                className="text-base font-bold text-blue-900 h-8"
-              />
+              <div className="relative">
+                <Input
+                  type="number"
+                  value={option.profitTarget || quoteData.profitTarget || 36}
+                  onChange={(e) => onUpdate(option.id, { ...option, profitTarget: parseFloat(e.target.value) || 0 })}
+                  className="text-base font-bold text-blue-900 h-8 pr-8"
+                />
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-blue-700 font-bold">%</span>
+              </div>
             </div>
             
             <div className="bg-white p-2 rounded border border-blue-200">
