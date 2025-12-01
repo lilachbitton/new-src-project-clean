@@ -120,8 +120,17 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
                 <label className="block text-xs text-gray-600 mb-1">כמות קרטונים סופית להובלה (ניתן לעריכה)</label>
                 <Input
                   type="number"
-                  value={option.finalDeliveryBoxes ?? option.deliveryBoxesCount ?? ""}
-                  onChange={(e) => onUpdate(option.id, { ...option, finalDeliveryBoxes: parseInt(e.target.value) || 0 })}
+                  value={option.finalDeliveryBoxes !== undefined && option.finalDeliveryBoxes !== null ? option.finalDeliveryBoxes : ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "") {
+                      // אם המשתמש מחק את השדה, הסר את finalDeliveryBoxes
+                      const { finalDeliveryBoxes, ...rest } = option;
+                      onUpdate(option.id, rest);
+                    } else {
+                      onUpdate(option.id, { ...option, finalDeliveryBoxes: parseInt(value) || 0 });
+                    }
+                  }}
                   placeholder={String(option.deliveryBoxesCount || 0)}
                   className="text-sm font-bold"
                 />

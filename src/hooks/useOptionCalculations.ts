@@ -179,7 +179,6 @@ export function useOptionCalculations(
     // עדכן רק שדות חישוביים, לא לדרוס שדות של המארז או ערכי קלט
     const calculatedFields = {
       deliveryBoxesCount,
-      finalDeliveryBoxes: option.finalDeliveryBoxes ?? deliveryBoxesCount,
       deliveryBreakdown,
       additionalExpenses,
       projectPriceWithVAT,
@@ -197,7 +196,7 @@ export function useOptionCalculations(
       packagingItemsCost,
       productsCost,
       actualProfit
-      // לא כוללים profitTarget ו-agentCommission - אלה שדות קלט!
+      // לא כוללים profitTarget, agentCommission, finalDeliveryBoxes - אלה שדות קלט!
     };
 
     // בדוק אם השדות המחושבים השתנו מאז העידכון האחרון
