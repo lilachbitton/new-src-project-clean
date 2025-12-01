@@ -117,6 +117,26 @@ export function useOptionCalculations(
       budgetPerPackage = budgetPerPackage / 1.18;
     }
     
+    // חישוב הוצאות נוספות אוטומטיות לפי תקציב לפני מע"מ
+    let recommendedAdditionalExpenses = 0;
+    if (budgetPerPackage < 90) {
+      recommendedAdditionalExpenses = 8;
+    } else if (budgetPerPackage < 151) {
+      recommendedAdditionalExpenses = 16;
+    } else if (budgetPerPackage < 201) {
+      recommendedAdditionalExpenses = 21;
+    } else if (budgetPerPackage < 251) {
+      recommendedAdditionalExpenses = 25;
+    } else if (budgetPerPackage < 301) {
+      recommendedAdditionalExpenses = 29;
+    } else {
+      recommendedAdditionalExpenses = 33;
+    }
+    
+    // עדכן הוצאות נוספות רק אם לא הוזן ידנית או שווה לערך הקודם המומלץ
+    const currentAdditionalExpenses = option.additionalExpenses || 0;
+    const additionalExpenses = currentAdditionalExpenses === 0 ? recommendedAdditionalExpenses : currentAdditionalExpenses;
+    
     // מחיר עלות: {תקציב למארז}*(1-{יעד רווחיות}-{עמלת סוכן %})
     // שים לב: לא מורידים משלוח כאן!
     const profitTarget = (option.profitTarget || quoteData.profitTarget || 36) / 100;
@@ -134,7 +154,6 @@ export function useOptionCalculations(
     const packagingWorkCost = productQuantity * 0.5 + (hasBox ? 2 : 1);
 
     // תקציב נותר למוצרים
-    const additionalExpenses = option.additionalExpenses || 0;
     const budgetRemainingForProducts = costPrice - (deliveryInPackage + productsCost + packagingItemsCost + additionalExpenses + packagingWorkCost);
 
     // רווח לעסקה בשקלים
@@ -157,6 +176,7 @@ export function useOptionCalculations(
       deliveryBoxesCount,
       finalDeliveryBoxes: option.finalDeliveryBoxes ?? deliveryBoxesCount,
       deliveryBreakdown,
+      additionalExpenses,
       projectPriceWithVAT,
       projectPriceToClientBeforeVAT,
       projectPriceToClientWithVAT,
