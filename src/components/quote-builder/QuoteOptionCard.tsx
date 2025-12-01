@@ -471,10 +471,17 @@ export function QuoteOptionCard({
               </div>
             </div>
             
-            <div className="bg-white p-2 rounded border border-blue-200 col-span-2">
+            <div className="bg-white p-2 rounded border border-blue-200">
               <div className="text-gray-600 text-xs mb-1">סה"כ רווח לעסקה:</div>
               <div className={`text-xl font-bold ${totalProfitColor}`}>
                 {(option.totalDealProfit || 0) < 0 ? '-' : ''}₪{Math.abs(option.totalDealProfit || 0).toFixed(2)}
+              </div>
+            </div>
+            
+            <div className="bg-white p-2 rounded border border-blue-200">
+              <div className="text-gray-600 text-xs mb-1">הכנסה ללא מע"מ:</div>
+              <div className="text-xl font-bold text-blue-900">
+                ₪{(option.revenueWithoutVAT || 0).toFixed(2)}
               </div>
             </div>
           </div>
