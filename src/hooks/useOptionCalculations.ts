@@ -44,6 +44,19 @@ export function useOptionCalculations(
 
     const packageQuantity = quoteData.packageQuantity || 1;
     
+    // תקציב לפני מע"מ למארז - הבסיס לכל החישובים!
+    const includeVAT = quoteData.includeVAT || false;
+    const budgetBeforeVATPerPackage = includeVAT 
+      ? (quoteData.budgetBeforeVAT || 0) / packageQuantity
+      : (quoteData.budgetPerPackage || 0);
+    
+    // תקציב למארז לאחר משלוח
+    const includeShipping = quoteData.includeShipping || false;
+    const shippingPriceToClient = option.shippingPriceToClient || 0;
+    const budgetAfterShipping = includeShipping 
+      ? budgetBeforeVATPerPackage - (shippingPriceToClient / packageQuantity)
+      : budgetBeforeVATPerPackage;
+
     // כמות קרטונים להובלה: CEILING({כמות מארזים} / {כמות שנכנסת בקרטון})
     const deliveryBoxesCount = Math.ceil(packageQuantity / unitsPerCarton);
 
@@ -58,14 +71,6 @@ export function useOptionCalculations(
 
     // תמחור לפרויקט ללקוח כולל מע"מ: {תמחור לפרויקט ללקוח לפני מע"מ}*1.18
     const projectPriceToClientWithVAT = projectPriceToClientBeforeVAT * 1.18;
-
-    // תקציב למארז לאחר משלוח
-    const includeShipping = quoteData.includeShipping || false;
-    const budgetPerPackage = quoteData.budgetPerPackage || 0;
-    const shippingPriceToClient = option.shippingPriceToClient || 0;
-    const budgetAfterShipping = includeShipping 
-      ? budgetPerPackage - (shippingPriceToClient / packageQuantity)
-      : budgetPerPackage;
 
     // מחיר עלות: {תקציב למארז לאחר משלוח}*(1-{יעד רווחיות}-{עמלת סוכן %})
     const profitTarget = (option.profitTarget || quoteData.profitTarget || 36) / 100; // המרה לערך עשרוני
@@ -93,7 +98,7 @@ export function useOptionCalculations(
     const totalDealProfit = packageQuantity * profitPerDeal;
 
     // הכנסה ללא מע"מ: ({תקציב למארז לפני מע"מ} * {כמות מארזים})+{תמחור לפרויקט ללקוח לפני מע"מ}
-    const revenueWithoutVAT = (budgetPerPackage * packageQuantity) + projectPriceToClientBeforeVAT;
+    const revenueWithoutVAT = (budgetBeforeVATPerPackage * packageQuantity) + projectPriceToClientBeforeVAT;
 
     // רווח בפועל למארז
     const actualProfit = profitPerDeal;
@@ -140,6 +145,8 @@ export function useOptionCalculations(
     option.packaging,
     option.projectPriceBeforeVAT,
     quoteData.budgetPerPackage,
+    quoteData.budgetBeforeVAT,
+    quoteData.includeVAT,
     quoteData.packageQuantity,
     quoteData.profitTarget,
     quoteData.agentCommission,
