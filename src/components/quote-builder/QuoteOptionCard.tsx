@@ -371,17 +371,18 @@ export function QuoteOptionCard({
   // חישוב תקציב למארז לאחר משלוח (עבור tooltips)
   const packageQuantity = quoteData.packageQuantity || 1;
   const includeVAT = quoteData.includeVAT || false;
+  let budgetPerPackage = quoteData.budgetPerPackage || 0;
   
-  // תקציב לפני מע"מ למארז - זה הבסיס לכל החישובים!
-  const budgetBeforeVATPerPackage = includeVAT 
-    ? (quoteData.budgetBeforeVAT || 0) / packageQuantity
-    : (quoteData.budgetPerPackage || 0);
+  // אם המחיר כולל מע"מ - הורד 18%
+  if (includeVAT) {
+    budgetPerPackage = budgetPerPackage / 1.18;
+  }
   
   const includeShipping = quoteData.includeShipping || false;
   const shippingPriceToClient = option.shippingPriceToClient || 0;
   const budgetAfterShipping = includeShipping 
-    ? budgetBeforeVATPerPackage - (shippingPriceToClient / packageQuantity)
-    : budgetBeforeVATPerPackage;
+    ? budgetPerPackage - (shippingPriceToClient / packageQuantity)
+    : budgetPerPackage;
   const shippingCostPerPackage = includeShipping ? (shippingPriceToClient / packageQuantity) : 0;
 
   return (
@@ -698,7 +699,7 @@ export function QuoteOptionCard({
                     </div>
                     
                     <div className="flex justify-between py-1">
-                      <Tooltip content={`(${budgetBeforeVATPerPackage.toFixed(2)} × ${packageQuantity}) + ${(option.projectPriceToClientBeforeVAT || 0).toFixed(2)} = ${(option.revenueWithoutVAT || 0).toFixed(2)}`}>
+                      <Tooltip content={`(${budgetPerPackage.toFixed(2)} × ${packageQuantity}) + ${(option.projectPriceToClientBeforeVAT || 0).toFixed(2)} = ${(option.revenueWithoutVAT || 0).toFixed(2)}`}>
                         <span className="text-gray-700 font-medium">הכנסה ללא מע"מ:</span>
                       </Tooltip>
                       <span className="font-bold text-blue-700">₪{(option.revenueWithoutVAT || 0).toFixed(2)}</span>
