@@ -302,7 +302,7 @@ async function buildOptions(optionsData: any[]) {
         
         // UI
         isCollapsed: false,
-        isIrrelevant: false,
+        isIrrelevant: safeString(option['סטאטוס']) === 'אופציה לא רלוונטית',
       };
 
       options.push(optionData);

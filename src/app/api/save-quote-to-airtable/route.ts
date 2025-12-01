@@ -134,6 +134,15 @@ export async function POST(request: NextRequest) {
         if (option.projectPriceBeforeVAT !== undefined) fields['תמחור לפרויקט לפני מע"מ CLAUDE'] = option.projectPriceBeforeVAT;
         if (option.shippingPriceToClient !== undefined) fields['תמחור משלוח ללקוח CLAUDE'] = option.shippingPriceToClient;
 
+        // קביעת סטטוס
+        if (option.isIrrelevant) {
+          fields['סטאטוס'] = 'אופציה לא רלוונטית';
+        } else if (option.items && option.items.length > 0) {
+          fields['סטאטוס'] = 'אופציה בעבודה';
+        } else if (option.packageId && isValidRecordId(option.packageId)) {
+          fields['סטאטוס'] = 'אופציה בעבודה';
+        }
+
         console.log(`🔄 מעדכן אופציה ${option.id}`);
         console.log(`📝 שדות שנשלחים לאיירטייבל:`, JSON.stringify(fields, null, 2));
         const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${OPTIONS_TABLE}/${option.airtableId}`, {
@@ -199,6 +208,15 @@ export async function POST(request: NextRequest) {
         const packagingIds = option.items?.filter((i: any) => i.type === 'packaging' && isValidRecordId(i.id)).map((i: any) => i.id) || [];
         if (productIds.length) fields['מוצרים'] = productIds;
         if (packagingIds.length) fields['מוצרי אריזה ומיתוג copy'] = packagingIds;
+
+        // קביעת סטטוס
+        if (option.isIrrelevant) {
+          fields['סטאטוס'] = 'אופציה לא רלוונטית';
+        } else if (productIds.length > 0 || packagingIds.length > 0) {
+          fields['סטאטוס'] = 'אופציה בעבודה';
+        } else if (option.packageId && isValidRecordId(option.packageId)) {
+          fields['סטאטוס'] = 'אופציה בעבודה';
+        }
 
         const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${OPTIONS_TABLE}`, {
           method: 'POST',
