@@ -48,6 +48,8 @@ export interface QuoteOption {
   packaging?: string; // fldKIHATOl5fs0fNe - אריזה (lookup)
   unitsPerCarton?: number; // fldlUzUgYtCzHqMUH - כמות שנכנסת בקרטון (lookup)
   deliveryBoxesCount?: number; // fldgFizG5ulcqnOGh - כמות קרטונים להובלה (formula)
+  finalDeliveryBoxes?: number; // כמות קרטונים סופית להובלה (ניתן לעריכה)
+  deliveryBreakdown?: string; // פירוט החלוקה (אוטומטי)
   shippingCompanyCost?: number; // fldJA3rlQKTvVEEj7 - עלות חברת משלוחים (קלט)
   shippingPriceToClient?: number; // fldSvnNx86B5x79U9 - תמחור משלוח ללקוח (קלט)
   projectPriceBeforeVAT?: number; // fld0xt9R9bJ4dEPHt - תמחור לפרויקט לפני מע"מ (קלט)

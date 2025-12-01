@@ -82,20 +82,55 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
       {isExpanded && (
         <div className="p-4 pt-0 space-y-4">
           
-          {/* שדות סטטיים/lookup */}
+          {/* שדות אריזה וקרטונים */}
           <div className="bg-white p-3 rounded border border-purple-100">
             <div className="text-xs font-semibold text-purple-600 mb-2">מידע כללי</div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-gray-600 mb-1">כמות שנכנסת בקרטון</label>
-                <div className="text-sm font-semibold p-2 bg-gray-50 rounded border">
-                  {option.unitsPerCarton || '-'}
-                </div>
+                <Input
+                  type="number"
+                  value={option.unitsPerCarton || ""}
+                  onChange={(e) => onUpdate(option.id, { ...option, unitsPerCarton: parseInt(e.target.value) || 1 })}
+                  placeholder="1"
+                  className="text-sm"
+                />
               </div>
               <div>
                 <label className="block text-xs text-gray-600 mb-1">אריזה</label>
                 <div className="text-sm p-2 bg-gray-50 rounded border truncate">
                   {option.packaging || '-'}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* חישובי קרטונים */}
+          <div className="bg-blue-50 p-3 rounded border border-blue-200">
+            <div className="text-xs font-semibold text-blue-700 mb-3">חישובי קרטונים</div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">כמות קרטונים להובלה (חישוב אוטומטי)</label>
+                <div className="text-lg font-bold p-2 bg-white rounded border border-blue-300 text-blue-900">
+                  {option.deliveryBoxesCount || 0}
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">כמות קרטונים סופית להובלה (ניתן לעריכה)</label>
+                <Input
+                  type="number"
+                  value={option.finalDeliveryBoxes ?? option.deliveryBoxesCount ?? ""}
+                  onChange={(e) => onUpdate(option.id, { ...option, finalDeliveryBoxes: parseInt(e.target.value) || 0 })}
+                  placeholder={String(option.deliveryBoxesCount || 0)}
+                  className="text-sm font-bold"
+                />
+              </div>
+              
+              <div className="bg-white p-3 rounded border border-blue-200">
+                <div className="text-xs text-gray-600 mb-1">פירוט החלוקה:</div>
+                <div className="text-sm font-semibold text-blue-900">
+                  {option.deliveryBreakdown || 'אין מידע'}
                 </div>
               </div>
             </div>
@@ -171,10 +206,6 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
           <div className="bg-white p-3 rounded border border-purple-100">
             <div className="text-xs font-semibold text-purple-600 mb-2">חישובים אוטומטיים</div>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between py-1">
-                <span className="text-gray-600">כמות קרטונים להובלה:</span>
-                <span className="font-semibold">{option.deliveryBoxesCount || 0}</span>
-              </div>
               <div className="flex justify-between py-1">
                 <span className="text-gray-600">תמחור לפרויקט כולל מע"מ:</span>
                 <span className="font-semibold">₪{(option.projectPriceWithVAT || 0).toFixed(2)}</span>

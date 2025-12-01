@@ -47,6 +47,24 @@ export function useOptionCalculations(
     // כמות קרטונים להובלה: CEILING({כמות מארזים} / {כמות שנכנסת בקרטון})
     const deliveryBoxesCount = Math.ceil(packageQuantity / unitsPerCarton);
 
+    // כמות קרטונים סופית - אם לא הוזן ידנית, לוקחים את החישוב האוטומטי
+    const finalDeliveryBoxes = option.finalDeliveryBoxes ?? deliveryBoxesCount;
+
+    // חישוב פירוט החלוקה אוטומטי
+    const packagesInFinalBoxes = finalDeliveryBoxes * unitsPerCarton;
+    const remainingPackages = packageQuantity - packagesInFinalBoxes;
+    
+    let deliveryBreakdown = '';
+    if (remainingPackages > 0) {
+      deliveryBreakdown = `${finalDeliveryBoxes} קרטונים + ${remainingPackages} מארזים ללא קרטון`;
+    } else if (remainingPackages < 0) {
+      // אם הזינו יותר מדי קרטונים
+      deliveryBreakdown = `${finalDeliveryBoxes} קרטונים (יותר מדי!)`;
+    } else {
+      // חלוקה מושלמת
+      deliveryBreakdown = `${finalDeliveryBoxes} קרטונים מלאים`;
+    }
+
     // חישובי תמחור לפרויקט - משתמשים ב"תמחור משלוח ללקוח" (לא מחיר מהספק!)
     const shippingPriceToClient = option.shippingPriceToClient || 0;
     
@@ -110,6 +128,8 @@ export function useOptionCalculations(
     // עדכן רק שדות חישוביים, לא לדרוס שדות של המארז או ערכי קלט
     const calculatedFields = {
       deliveryBoxesCount,
+      finalDeliveryBoxes: option.finalDeliveryBoxes ?? deliveryBoxesCount,
+      deliveryBreakdown,
       projectPriceWithVAT,
       projectPriceToClientBeforeVAT,
       projectPriceToClientWithVAT,
@@ -149,6 +169,7 @@ export function useOptionCalculations(
     option.unitsPerCarton,
     option.packaging,
     option.projectPriceBeforeVAT,
+    option.finalDeliveryBoxes,
     quoteData.budgetPerPackage,
     quoteData.includeVAT,
     quoteData.packageQuantity,
