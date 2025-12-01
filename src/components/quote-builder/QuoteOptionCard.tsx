@@ -93,7 +93,7 @@ export function QuoteOptionCard({
         
         if (itemData.packagingItems) {
           const packagingItem = itemData.packagingItems.find((item: any) => 
-            item.productType?.toLowerCase() === 'אריזה'
+            item.productType === 'אריזה'
           );
           
           if (packagingItem) {
@@ -130,15 +130,36 @@ export function QuoteOptionCard({
           details: itemData.details || "",
           price: itemData.price || 0,
           type: ["אריזה", "מיתוג", "קיטלוג"].some(t => 
-            itemData.productType?.toLowerCase()?.includes(t)
+            itemData.productType?.includes(t)
           ) ? "packaging" : "product",
           productType: itemData.productType || "",
           isEditable: true,
         };
 
+        console.log('📦 מוסיף מוצר בודד:', {
+          name: newItem.name,
+          type: newItem.type,
+          productType: itemData.productType,
+          boxesPerCarton: itemData.boxesPerCarton
+        });
+
+        const updatedItems = [...option.items, newItem];
+        
+        // אם זה מוצר אריזה - עדכן את השדות packaging ו-unitsPerCarton
+        let packagingName = option.packaging || '';
+        let unitsPerCarton = option.unitsPerCarton || null;
+        
+        if (newItem.type === 'packaging' && itemData.productType === 'אריזה') {
+          packagingName = itemData.marketingDescription || itemData.name || '';
+          unitsPerCarton = itemData.boxesPerCarton || null;
+          console.log('✅ מעדכן שדות אריזה:', { packagingName, unitsPerCarton });
+        }
+
         onUpdate(option.id, {
           ...option,
-          items: [...option.items, newItem]
+          items: updatedItems,
+          packaging: packagingName,
+          unitsPerCarton: unitsPerCarton,
         });
       }
     } catch (error) {

@@ -60,9 +60,9 @@ function determineProductType(productType?: string): 'product' | 'packaging' {
   if (!productType) return 'product';
   
   const brandingTypes = ['אריזה', 'מיתוג', 'קיטלוג'];
-  const type = productType.toLowerCase();
   
+  // השוואה ישירה ללא toLowerCase כי זה לא עובד עם עברית
   return brandingTypes.some(brandingType => 
-    type.includes(brandingType.toLowerCase())
+    productType.includes(brandingType)
   ) ? 'packaging' : 'product';
 }
