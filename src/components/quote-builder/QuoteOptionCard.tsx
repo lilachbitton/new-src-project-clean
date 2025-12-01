@@ -380,9 +380,6 @@ export function QuoteOptionCard({
   
   const includeShipping = quoteData.includeShipping || false;
   const shippingPriceToClient = option.shippingPriceToClient || 0;
-  const budgetAfterShipping = includeShipping 
-    ? budgetPerPackage - (shippingPriceToClient / packageQuantity)
-    : budgetPerPackage;
   const shippingCostPerPackage = includeShipping ? (shippingPriceToClient / packageQuantity) : 0;
 
   return (
@@ -628,11 +625,20 @@ export function QuoteOptionCard({
                     </div>
                     
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <Tooltip content={`${budgetAfterShipping.toFixed(2)} × (1 - ${((option.profitTarget || quoteData.profitTarget || 36)/100).toFixed(2)} - ${((option.agentCommission || quoteData.agentCommission || 0)/100).toFixed(2)}) = ${(option.costPrice || 0).toFixed(2)}`}>
+                      <Tooltip content={`${budgetPerPackage.toFixed(2)} × (1 - ${((option.profitTarget || quoteData.profitTarget || 36)/100).toFixed(2)} - ${((option.agentCommission || quoteData.agentCommission || 0)/100).toFixed(2)}) = ${(option.costPrice || 0).toFixed(2)}`}>
                         <span className="text-gray-600">מחיר עלות:</span>
                       </Tooltip>
                       <span className="font-semibold">₪{(option.costPrice || 0).toFixed(2)}</span>
                     </div>
+                    
+                    {includeShipping && (
+                      <div className="flex justify-between py-1 border-b border-blue-100">
+                        <Tooltip content={`${shippingPriceToClient.toFixed(2)} ÷ ${packageQuantity} = ${(option.shippingCostPerPackage || 0).toFixed(2)}`}>
+                          <span className="text-gray-600">מחיר משלוח למארז:</span>
+                        </Tooltip>
+                        <span className="font-semibold">₪{(option.shippingCostPerPackage || 0).toFixed(2)}</span>
+                      </div>
+                    )}
                     
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <Tooltip content={`${option.productQuantity || 0} × 0.5 + ${option.packaging?.includes('קופסת') ? '2' : '1'} = ${(option.packagingWorkCost || 0).toFixed(2)}`}>
@@ -655,6 +661,15 @@ export function QuoteOptionCard({
                       <span className="font-semibold">₪{(option.productsCost || 0).toFixed(2)}</span>
                     </div>
                     
+                    {(option.additionalExpenses || 0) > 0 && (
+                      <div className="flex justify-between py-1 border-b border-blue-100">
+                        <Tooltip content={`הוצאות נוספות שהוזנו: ${(option.additionalExpenses || 0).toFixed(2)}`}>
+                          <span className="text-gray-600">הוצאות נוספות:</span>
+                        </Tooltip>
+                        <span className="font-semibold">₪{(option.additionalExpenses || 0).toFixed(2)}</span>
+                      </div>
+                    )}
+                    
                     <div className="flex justify-between py-1 border-b border-blue-100">
                       <Tooltip content={`${(option.costPrice || 0).toFixed(2)} - ${shippingCostPerPackage.toFixed(2)} - ${(option.productsCost || 0).toFixed(2)} - ${(option.packagingItemsCost || 0).toFixed(2)} - ${(option.additionalExpenses || 0).toFixed(2)} - ${(option.packagingWorkCost || 0).toFixed(2)} = ${(option.budgetRemainingForProducts || 0).toFixed(2)}`}>
                         <span className="text-gray-600">תקציב נותר למוצרים:</span>
@@ -672,7 +687,7 @@ export function QuoteOptionCard({
                     </div>
                     
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <Tooltip content={`(${(option.profitPerDeal || 0).toFixed(2)} ÷ ${budgetAfterShipping.toFixed(2)}) × 100 = ${((option.actualProfitPercentage || 0) * 100).toFixed(2)}%`}>
+                      <Tooltip content={`(${(option.profitPerDeal || 0).toFixed(2)} ÷ ${budgetPerPackage.toFixed(2)}) × 100 = ${((option.actualProfitPercentage || 0) * 100).toFixed(2)}%`}>
                         <span className="text-gray-600">% רווח בפועל למארז:</span>
                       </Tooltip>
                       <span className={`font-semibold ${(option.actualProfitPercentage || 0) < 0 ? 'text-red-600' : 'text-green-600'}`}>
@@ -681,7 +696,7 @@ export function QuoteOptionCard({
                     </div>
                     
                     <div className="flex justify-between py-1 border-b border-green-100">
-                      <Tooltip content={`${budgetAfterShipping.toFixed(2)} - ${shippingCostPerPackage.toFixed(2)} - ${(option.productsCost || 0).toFixed(2)} - ${(option.additionalExpenses || 0).toFixed(2)} - ${(option.packagingItemsCost || 0).toFixed(2)} - ${(option.packagingWorkCost || 0).toFixed(2)} - (${((option.agentCommission || quoteData.agentCommission || 0)/100).toFixed(2)} × ${budgetAfterShipping.toFixed(2)}) = ${(option.profitPerDeal || 0).toFixed(2)}`}>
+                      <Tooltip content={`${budgetPerPackage.toFixed(2)} - ${shippingCostPerPackage.toFixed(2)} - ${(option.productsCost || 0).toFixed(2)} - ${(option.additionalExpenses || 0).toFixed(2)} - ${(option.packagingItemsCost || 0).toFixed(2)} - ${(option.packagingWorkCost || 0).toFixed(2)} - (${((option.agentCommission || quoteData.agentCommission || 0)/100).toFixed(2)} × ${budgetPerPackage.toFixed(2)}) = ${(option.profitPerDeal || 0).toFixed(2)}`}>
                         <span className="text-gray-700 font-medium">רווח לעסקה בשקלים:</span>
                       </Tooltip>
                       <span className={`font-bold ${(option.profitPerDeal || 0) < 0 ? 'text-red-700' : 'text-green-700'}`}>

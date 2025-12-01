@@ -47,11 +47,14 @@ export function useOptionCalculations(
     // כמות קרטונים להובלה: CEILING({כמות מארזים} / {כמות שנכנסת בקרטון})
     const deliveryBoxesCount = Math.ceil(packageQuantity / unitsPerCarton);
 
-    // תמחור לפרויקט כולל מע"מ: {תמחור לפרויקט לפני מע"מ}*1.18
-    const projectPriceBeforeVAT = option.projectPriceBeforeVAT || 0;
+    // חישובי תמחור לפרויקט - משתמשים ב"תמחור משלוח ללקוח" (לא מחיר מהספק!)
+    const shippingPriceToClient = option.shippingPriceToClient || 0;
+    
+    // תמחור לפרויקט לפני מע"מ: משלוח ללקוח (כפי שהוזן ידנית)
+    const projectPriceBeforeVAT = shippingPriceToClient;
     const projectPriceWithVAT = projectPriceBeforeVAT * 1.18;
 
-    // תמחור לפרויקט ללקוח לפני מע"מ: IF({תמחור לפרויקט לפני מע"מ} < 600, {תמחור לפרויקט לפני מע"מ} * 1.1, {תמחור לפרויקט לפני מע"מ})
+    // תמחור לפרויקט ללקוח לפני מע"מ: IF(תמחור < 600, תמחור * 1.1, תמחור)
     const projectPriceToClientBeforeVAT = projectPriceBeforeVAT < 600 
       ? projectPriceBeforeVAT * 1.1 
       : projectPriceBeforeVAT;
@@ -69,15 +72,14 @@ export function useOptionCalculations(
       budgetPerPackage = budgetPerPackage / 1.18;
     }
     
-    const shippingPriceToClient = option.shippingPriceToClient || 0;
-    const budgetAfterShipping = includeShipping 
-      ? budgetPerPackage - (shippingPriceToClient / packageQuantity)
-      : budgetPerPackage;
+    // מחיר עלות: {תקציב למארז}*(1-{יעד רווחיות}-{עמלת סוכן %})
+    // שים לב: לא מורידים משלוח כאן!
+    const profitTarget = (option.profitTarget || quoteData.profitTarget || 36) / 100;
+    const agentCommission = (option.agentCommission || quoteData.agentCommission || 0) / 100;
+    const costPrice = budgetPerPackage * (1 - profitTarget - agentCommission);
 
-    // מחיר עלות: {תקציב למארז לאחר משלוח}*(1-{יעד רווחיות}-{עמלת סוכן %})
-    const profitTarget = (option.profitTarget || quoteData.profitTarget || 36) / 100; // המרה לערך עשרוני
-    const agentCommission = (option.agentCommission || quoteData.agentCommission || 0) / 100; // המרה לערך עשרוני
-    const costPrice = budgetAfterShipping * (1 - profitTarget - agentCommission);
+    // מחיר משלוח למארז (מחושב מ"תמחור משלוח ללקוח")
+    const shippingCostPerPackage = includeShipping ? (shippingPriceToClient / packageQuantity) : 0;
 
     // הובלה במארז
     const deliveryInPackage = includeShipping ? (shippingPriceToClient / packageQuantity) : 0;
@@ -91,10 +93,10 @@ export function useOptionCalculations(
     const budgetRemainingForProducts = costPrice - (deliveryInPackage + productsCost + packagingItemsCost + additionalExpenses + packagingWorkCost);
 
     // רווח לעסקה בשקלים
-    const profitPerDeal = budgetAfterShipping - deliveryInPackage - productsCost - additionalExpenses - packagingItemsCost - packagingWorkCost - (agentCommission * budgetAfterShipping);
+    const profitPerDeal = budgetPerPackage - deliveryInPackage - productsCost - additionalExpenses - packagingItemsCost - packagingWorkCost - (agentCommission * budgetPerPackage);
 
     // % רווח בפועל למארז
-    const actualProfitPercentage = budgetAfterShipping > 0 ? profitPerDeal / budgetAfterShipping : 0;
+    const actualProfitPercentage = budgetPerPackage > 0 ? profitPerDeal / budgetPerPackage : 0;
 
     // סה"כ רווח לעסקה
     const totalDealProfit = packageQuantity * profitPerDeal;
@@ -113,6 +115,7 @@ export function useOptionCalculations(
       projectPriceToClientWithVAT,
       packagingWorkCost,
       costPrice,
+      shippingCostPerPackage,
       budgetRemainingForProducts,
       profitPerDeal,
       actualProfitPercentage,

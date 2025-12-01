@@ -30,6 +30,7 @@ export interface QuoteOption {
   agentCommission?: number; // עמלת סוכן %
   agentCommissionDisplay?: number; // עמלת סוכן לתצוגה
   costPrice?: number; // מחיר עלות
+  shippingCostPerPackage?: number; // מחיר משלוח למארז
   additionalExpenses?: number; // הוצאות נוספות
   packagingWorkCost?: number; // עלות עבודת אריזה
   packagingItemsCost?: number; // עלות מוצרי אריזה ומיתוג
