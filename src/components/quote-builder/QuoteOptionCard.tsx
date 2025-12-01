@@ -68,7 +68,7 @@ export function QuoteOptionCard({
       // Handle package drop
       if (itemData.items) {
         const regularItems = itemData.items.map((item: any) => ({
-          id: item.id, // שמור ID אמיתי!
+          id: item.id,
           name: item.marketingDescription || item.name,
           details: item.details || "",
           price: item.price || 0,
@@ -79,7 +79,7 @@ export function QuoteOptionCard({
 
         const packagingItems = itemData.packagingItems ? 
           itemData.packagingItems.map((item: any) => ({
-            id: item.id, // שמור ID אמיתי!
+            id: item.id,
             name: item.marketingDescription || item.name,
             details: item.details || "",
             price: item.price || 0,
@@ -88,7 +88,6 @@ export function QuoteOptionCard({
             isEditable: true,
           })) : [];
 
-        // מצא את מוצר האריזה מתוך המארז
         let packagingName = '';
         let unitsPerCarton: number | undefined = undefined;
         
@@ -100,17 +99,8 @@ export function QuoteOptionCard({
           if (packagingItem) {
             packagingName = packagingItem.marketingDescription || packagingItem.name || '';
             unitsPerCarton = packagingItem.boxesPerCarton || undefined;
-            console.log('📦 נמצא מוצר אריזה:', packagingName, 'כמות בקרטון:', unitsPerCarton);
           }
         }
-
-        console.log('🎁 מעדכן אופציה עם מארז:', {
-          packageId: itemData.id,
-          packageNumber: itemData.packageNumber,
-          imageUrl: itemData.imageUrl,
-          packaging: packagingName,
-          unitsPerCarton
-        });
 
         onUpdate(option.id, {
           ...option,
@@ -120,13 +110,12 @@ export function QuoteOptionCard({
           items: [...regularItems, ...packagingItems],
           total: itemData.packagePrice || 0,
           image: itemData.imageUrl || null,
-          packaging: packagingName, // הוסף את שם האריזה
-          unitsPerCarton: unitsPerCarton, // הוסף כמות בקרטון
+          packaging: packagingName,
+          unitsPerCarton: unitsPerCarton,
         });
       } else {
-        // Handle single product drop
         const newItem: Item = {
-          id: itemData.id, // שמור ID אמיתי!
+          id: itemData.id,
           name: itemData.marketingDescription || itemData.name,
           details: itemData.details || "",
           price: itemData.price || 0,
@@ -137,23 +126,14 @@ export function QuoteOptionCard({
           isEditable: true,
         };
 
-        console.log('📦 מוסיף מוצר בודד:', {
-          name: newItem.name,
-          type: newItem.type,
-          productType: itemData.productType,
-          boxesPerCarton: itemData.boxesPerCarton
-        });
-
         const updatedItems = [...option.items, newItem];
         
-        // אם זה מוצר אריזה - עדכן את השדות packaging ו-unitsPerCarton
         let packagingName = option.packaging || '';
         let unitsPerCarton: number | undefined = option.unitsPerCarton;
         
         if (newItem.type === 'packaging' && itemData.productType === 'אריזה') {
           packagingName = itemData.marketingDescription || itemData.name || '';
           unitsPerCarton = itemData.boxesPerCarton || undefined;
-          console.log('✅ מעדכן שדות אריזה:', { packagingName, unitsPerCarton });
         }
 
         onUpdate(option.id, {
@@ -178,7 +158,6 @@ export function QuoteOptionCard({
       type: "product",
     };
 
-    // Insert after last product (before packaging items)
     const items = [...option.items];
     const lastProductIndex = items.reduce((lastIndex, item, index) => 
       item.type !== "packaging" ? index : lastIndex, -1);
@@ -202,7 +181,6 @@ export function QuoteOptionCard({
       type: "packaging",
     };
 
-    // Insert after last packaging item
     const items = [...option.items];
     const lastPackagingIndex = items.reduce((lastIndex, item, index) => 
       item.type === "packaging" ? index : lastIndex, -1);
@@ -244,7 +222,6 @@ export function QuoteOptionCard({
     onUpdate(option.id, { ...option, items: updatedItems });
   };
 
-  // Handle row drag and drop
   const handleRowDragStart = (e: React.DragEvent, itemId: string) => {
     setDraggedItem(itemId);
     e.dataTransfer.effectAllowed = 'move';
@@ -276,7 +253,6 @@ export function QuoteOptionCard({
     
     if (draggedIndex === -1 || targetIndex === -1) return;
     
-    // Remove dragged item and insert at target position
     const [removed] = items.splice(draggedIndex, 1);
     items.splice(targetIndex, 0, removed);
     
@@ -392,12 +368,21 @@ export function QuoteOptionCard({
   const packagingItems = option.items.filter(item => item.type === 'packaging');
   const productItems = option.items.filter(item => item.type !== 'packaging');
 
+  // חישוב תקציב למארז לאחר משלוח (עבור tooltips)
+  const packageQuantity = quoteData.packageQuantity || 1;
+  const budgetPerPackage = quoteData.budgetPerPackage || 0;
+  const includeShipping = quoteData.includeShipping || false;
+  const shippingPriceToClient = option.shippingPriceToClient || 0;
+  const budgetAfterShipping = includeShipping 
+    ? budgetPerPackage - (shippingPriceToClient / packageQuantity)
+    : budgetPerPackage;
+  const shippingCostPerPackage = includeShipping ? (shippingPriceToClient / packageQuantity) : 0;
+
   return (
     <Card className={`bg-white border-2 shadow-lg hover:shadow-xl transition-all ${
       isIrrelevant ? 'border-gray-300' : 'border-blue-200'
     }`}>
       
-      {/* Header */}
       <CardHeader className="border-b bg-white/80 flex-row justify-between items-center py-3">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={handleToggleCollapse}>
@@ -442,7 +427,6 @@ export function QuoteOptionCard({
         </div>
       </CardHeader>
 
-      {/* Content */}
       {!option.isCollapsed && (
         <CardContent className="p-6">
           <div
@@ -451,7 +435,6 @@ export function QuoteOptionCard({
             className="min-h-[200px] rounded-lg border-2 border-dashed border-gray-200 hover:border-blue-300 transition-colors"
           >
             
-            {/* Package Image */}
             {option.image && (
               <div className="mb-6 flex justify-center">
                 <div className="max-w-md">
@@ -468,7 +451,6 @@ export function QuoteOptionCard({
               </div>
             )}
             
-            {/* Package Info - מספר מארז, אריזה וכמות בקרטון */}
             {(option.packageNumber || option.packageId || option.packaging || option.unitsPerCarton) && (
               <div className="bg-purple-50 p-3 rounded-lg border border-purple-200 mb-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -500,7 +482,6 @@ export function QuoteOptionCard({
               </div>
             )}
             
-            {/* Packaging Items Section */}
             {packagingItems.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm mb-6">
                 <div className="text-sm font-semibold bg-gray-50 text-gray-700 px-4 py-3 border-b">
@@ -523,7 +504,6 @@ export function QuoteOptionCard({
               </div>
             )}
 
-            {/* Regular Products Section */}
             {productItems.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm mb-6">
                 <div className="text-sm font-semibold bg-gray-50 text-gray-700 px-4 py-3 border-b">
@@ -546,14 +526,12 @@ export function QuoteOptionCard({
               </div>
             )}
 
-            {/* Empty State */}
             {option.items.length === 0 && (
               <div className="flex items-center justify-center h-32 text-gray-500">
                 גרור מוצרים או מארזים לכאן
               </div>
             )}
 
-            {/* Add Item Buttons */}
             <div className="flex gap-2 mt-4">
               <Button
                 variant="outline"
@@ -576,16 +554,13 @@ export function QuoteOptionCard({
               </Button>
             </div>
 
-            {/* Financial Summary & Calculations */}
             {option.items.length > 0 && (
               <div className="mt-6 space-y-4">
-                {/* עלויות משלוח */}
                 <ShippingSection 
                   option={option}
                   onUpdate={onUpdate}
                 />
 
-                {/* שדות קלט */}
                 <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
                   <h4 className="text-sm font-bold text-yellow-700 mb-3">שדות קלט</h4>
                   <div className="grid grid-cols-3 gap-4">
@@ -633,7 +608,6 @@ export function QuoteOptionCard({
                   </div>
                 </div>
 
-                {/* חישובים - תצוגה בלבד */}
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                   <h4 className="text-sm font-bold text-blue-700 mb-3">חישובים</h4>
                   <div className="space-y-1 text-sm">
@@ -647,7 +621,7 @@ export function QuoteOptionCard({
                     </div>
                     
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <Tooltip content={`${(option.budgetAfterShipping || 0).toFixed(2)} × (1 - ${((option.profitTarget || quoteData.profitTarget || 36)/100).toFixed(2)} - ${((option.agentCommission || quoteData.agentCommission || 0)/100).toFixed(2)}) = ${(option.costPrice || 0).toFixed(2)}`}>
+                      <Tooltip content={`${budgetAfterShipping.toFixed(2)} × (1 - ${((option.profitTarget || quoteData.profitTarget || 36)/100).toFixed(2)} - ${((option.agentCommission || quoteData.agentCommission || 0)/100).toFixed(2)}) = ${(option.costPrice || 0).toFixed(2)}`}>
                         <span className="text-gray-600">מחיר עלות:</span>
                       </Tooltip>
                       <span className="font-semibold">₪{(option.costPrice || 0).toFixed(2)}</span>
@@ -675,7 +649,7 @@ export function QuoteOptionCard({
                     </div>
                     
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <Tooltip content={`${(option.costPrice || 0).toFixed(2)} - ${(option.shippingCostPerPackage || 0).toFixed(2)} - ${(option.productsCost || 0).toFixed(2)} - ${(option.packagingItemsCost || 0).toFixed(2)} - ${(option.additionalExpenses || 0).toFixed(2)} - ${(option.packagingWorkCost || 0).toFixed(2)} = ${(option.budgetRemainingForProducts || 0).toFixed(2)}`}>
+                      <Tooltip content={`${(option.costPrice || 0).toFixed(2)} - ${shippingCostPerPackage.toFixed(2)} - ${(option.productsCost || 0).toFixed(2)} - ${(option.packagingItemsCost || 0).toFixed(2)} - ${(option.additionalExpenses || 0).toFixed(2)} - ${(option.packagingWorkCost || 0).toFixed(2)} = ${(option.budgetRemainingForProducts || 0).toFixed(2)}`}>
                         <span className="text-gray-600">תקציב נותר למוצרים:</span>
                       </Tooltip>
                       <span className={`font-semibold ${(option.budgetRemainingForProducts || 0) < 0 ? 'text-red-600' : ''}`}>
@@ -691,7 +665,7 @@ export function QuoteOptionCard({
                     </div>
                     
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <Tooltip content={`(${(option.profitPerDeal || 0).toFixed(2)} ÷ ${(option.budgetAfterShipping || 0).toFixed(2)}) × 100 = ${((option.actualProfitPercentage || 0) * 100).toFixed(2)}%`}>
+                      <Tooltip content={`(${(option.profitPerDeal || 0).toFixed(2)} ÷ ${budgetAfterShipping.toFixed(2)}) × 100 = ${((option.actualProfitPercentage || 0) * 100).toFixed(2)}%`}>
                         <span className="text-gray-600">% רווח בפועל למארז:</span>
                       </Tooltip>
                       <span className={`font-semibold ${(option.actualProfitPercentage || 0) < 0 ? 'text-red-600' : 'text-green-600'}`}>
@@ -700,7 +674,7 @@ export function QuoteOptionCard({
                     </div>
                     
                     <div className="flex justify-between py-1 border-b border-green-100">
-                      <Tooltip content={`${(option.budgetAfterShipping || 0).toFixed(2)} - ${(option.shippingCostPerPackage || 0).toFixed(2)} - ${(option.productsCost || 0).toFixed(2)} - ${(option.additionalExpenses || 0).toFixed(2)} - ${(option.packagingItemsCost || 0).toFixed(2)} - ${(option.packagingWorkCost || 0).toFixed(2)} - (${((option.agentCommission || quoteData.agentCommission || 0)/100).toFixed(2)} × ${(option.budgetAfterShipping || 0).toFixed(2)}) = ${(option.profitPerDeal || 0).toFixed(2)}`}>
+                      <Tooltip content={`${budgetAfterShipping.toFixed(2)} - ${shippingCostPerPackage.toFixed(2)} - ${(option.productsCost || 0).toFixed(2)} - ${(option.additionalExpenses || 0).toFixed(2)} - ${(option.packagingItemsCost || 0).toFixed(2)} - ${(option.packagingWorkCost || 0).toFixed(2)} - (${((option.agentCommission || quoteData.agentCommission || 0)/100).toFixed(2)} × ${budgetAfterShipping.toFixed(2)}) = ${(option.profitPerDeal || 0).toFixed(2)}`}>
                         <span className="text-gray-700 font-medium">רווח לעסקה בשקלים:</span>
                       </Tooltip>
                       <span className={`font-bold ${(option.profitPerDeal || 0) < 0 ? 'text-red-700' : 'text-green-700'}`}>
@@ -709,7 +683,7 @@ export function QuoteOptionCard({
                     </div>
                     
                     <div className="flex justify-between py-1 border-b border-green-100">
-                      <Tooltip content={`${quoteData.packageQuantity || 0} × ${(option.profitPerDeal || 0).toFixed(2)} = ${(option.totalDealProfit || 0).toFixed(2)}`}>
+                      <Tooltip content={`${packageQuantity} × ${(option.profitPerDeal || 0).toFixed(2)} = ${(option.totalDealProfit || 0).toFixed(2)}`}>
                         <span className="text-gray-700 font-medium">סה"כ רווח לעסקה:</span>
                       </Tooltip>
                       <span className={`font-bold ${(option.totalDealProfit || 0) < 0 ? 'text-red-700' : 'text-green-700'}`}>
@@ -718,7 +692,7 @@ export function QuoteOptionCard({
                     </div>
                     
                     <div className="flex justify-between py-1">
-                      <Tooltip content={`(${(option.budgetBeforeVAT || 0).toFixed(2)} × ${quoteData.packageQuantity || 0}) + ${(option.projectPriceBeforeVAT || quoteData.projectPriceBeforeVAT || 0).toFixed(2)} = ${(option.revenueWithoutVAT || 0).toFixed(2)}`}>
+                      <Tooltip content={`(${budgetPerPackage.toFixed(2)} × ${packageQuantity}) + ${(option.projectPriceBeforeVAT || quoteData.projectPriceBeforeVAT || 0).toFixed(2)} = ${(option.revenueWithoutVAT || 0).toFixed(2)}`}>
                         <span className="text-gray-700 font-medium">הכנסה ללא מע"מ:</span>
                       </Tooltip>
                       <span className="font-bold text-blue-700">₪{(option.revenueWithoutVAT || 0).toFixed(2)}</span>
@@ -726,7 +700,6 @@ export function QuoteOptionCard({
                   </div>
                 </div>
 
-                {/* מחיר סופי */}
                 <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-4 rounded-lg shadow-md">
                   <div className="flex justify-between items-center text-white">
                     <span className="text-lg font-bold">מחיר עלות סופי:</span>
