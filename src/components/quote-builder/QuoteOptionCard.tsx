@@ -561,7 +561,6 @@ export function QuoteOptionCard({
                 <ShippingSection 
                   option={option}
                   onUpdate={onUpdate}
-                  distribution={quoteData.distribution}
                 />
 
                 {/* שדות קלט */}

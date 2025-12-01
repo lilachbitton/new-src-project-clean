@@ -209,6 +209,19 @@ export function CustomerInfo({ quoteData, onUpdate }: CustomerInfoProps) {
               className="text-sm"
             />
           </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">הפצה</label>
+            <select
+              value={quoteData.distribution || ""}
+              onChange={(e) => updateField('distribution', e.target.value)}
+              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md"
+            >
+              <option value="">בחר</option>
+              <option value="משלוח לנקודה אחת">משלוח לנקודה אחת</option>
+              <option value="משלוח למספר נקודות">משלוח למספר נקודות</option>
+              <option value="איסוף עצמי">איסוף עצמי</option>
+            </select>
+          </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">גלויה</label>

@@ -235,6 +235,7 @@ export async function POST(request: NextRequest) {
       if (quoteData.preferredPackaging) fields['סוג אריזה מועדף'] = quoteData.preferredPackaging;
       if (quoteData.deliveryAddress) fields['כתובת אספקה'] = quoteData.deliveryAddress;
       if (quoteData.deliveryDate) fields['תאריך אספקה מבוקש'] = quoteData.deliveryDate;
+      if (quoteData.distribution) fields['הפצה'] = quoteData.distribution;
 
       console.log('🔄 מעדכן הזדמנות מכירה:', quoteData.opportunityId);
 
