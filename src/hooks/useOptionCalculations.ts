@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo, useState } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { QuoteOption, QuoteData } from '@/types';
 
 export function useOptionCalculations(
@@ -6,6 +6,8 @@ export function useOptionCalculations(
   quoteData: QuoteData,
   onUpdate: (optionId: string, updatedOption: QuoteOption) => void
 ) {
+  const prevCalculatedRef = useRef<any>(null);
+  
   // Track items and package changes with useMemo
   const itemsHash = useMemo(() => {
     return JSON.stringify({
@@ -116,11 +118,18 @@ export function useOptionCalculations(
       // לא כוללים profitTarget ו-agentCommission - אלה שדות קלט!
     };
 
-    // עדכן רק את השדות המחושבים, לא את שדות המארז
-    onUpdate(option.id, {
-      ...option,
-      ...calculatedFields
-    });
+    // בדוק אם השדות המחושבים השתנו מאז העידכון האחרון
+    const calculatedFieldsHash = JSON.stringify(calculatedFields);
+    
+    if (prevCalculatedRef.current !== calculatedFieldsHash) {
+      prevCalculatedRef.current = calculatedFieldsHash;
+      
+      // עדכן רק את השדות המחושבים, לא את שדות המארז
+      onUpdate(option.id, {
+        ...option,
+        ...calculatedFields
+      });
+    }
   }, [
     itemsHash,
     option.additionalExpenses,
@@ -135,7 +144,7 @@ export function useOptionCalculations(
     quoteData.profitTarget,
     quoteData.agentCommission,
     quoteData.includeShipping,
-    option.id,
-    onUpdate
+    option.id
+    // הסרנו onUpdate מכאן כדי למנוע infinite loop
   ]);
 }

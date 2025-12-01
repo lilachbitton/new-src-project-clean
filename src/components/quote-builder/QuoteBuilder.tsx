@@ -136,9 +136,12 @@ export function QuoteBuilder({ quoteId, searchParams }: QuoteBuilderProps) {
   const handleUpdateOption = useCallback((optionId: string, updatedOption: any) => {
     updateOption(optionId, updatedOption);
     if (quoteData?.options) {
-      setTimeout(() => addToHistory(quoteData.options), 0);
+      const currentOptions = quoteData.options.map(opt => 
+        opt.id === optionId ? updatedOption : opt
+      );
+      setTimeout(() => addToHistory(currentOptions), 0);
     }
-  }, [updateOption, quoteData, addToHistory]);
+  }, [updateOption, addToHistory, quoteData?.options]);
 
   const handleAddOption = useCallback(() => {
     addOption();
@@ -165,14 +168,14 @@ export function QuoteBuilder({ quoteId, searchParams }: QuoteBuilderProps) {
     updateQuoteData(updatedData);
   }, [updateQuoteData]);
 
-  // Debug info display
-  console.log('🔍 QuoteBuilder state:', {
-    isLoading,
-    hasQuoteData: !!quoteData,
-    quoteNumber: quoteData?.quoteNumber,
-    debugInfo,
-    loadingError,
-  });
+  // Debug info display - מבוטל כדי למנוע הצפה
+  // console.log('🔍 QuoteBuilder state:', {
+  //   isLoading,
+  //   hasQuoteData: !!quoteData,
+  //   quoteNumber: quoteData?.quoteNumber,
+  //   debugInfo,
+  //   loadingError,
+  // });
 
   // Loading state
   if (isLoading || !quoteData) {
