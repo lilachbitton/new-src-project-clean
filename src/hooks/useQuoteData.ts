@@ -51,6 +51,7 @@ export function useQuoteData(initialData?: QuoteData | null) {
       title: `אופציה ${quoteData.options.length + 1}`,
       items: [],
       total: 0,
+      additionalExpenses: 16, // ברירת מחדל 16 ש"ח
       isCollapsed: false,
       isIrrelevant: false,
     };
@@ -210,6 +211,7 @@ export function useQuoteData(initialData?: QuoteData | null) {
         title: 'אופציה 1',
         items: [],
         total: 0,
+        additionalExpenses: 16, // ברירת מחדל 16 ש"ח
         isCollapsed: false,
         isIrrelevant: false,
       }],

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Tooltip } from '@/components/ui/tooltip';
 import { QuoteData, QuoteOption, Item } from '@/types';
 import { useOptionCalculations } from '@/hooks/useOptionCalculations';
 import { ShippingSection } from './ShippingSection';
