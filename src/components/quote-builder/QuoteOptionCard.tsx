@@ -39,6 +39,8 @@ export function QuoteOptionCard({
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [dragOverItem, setDragOverItem] = useState<string | null>(null);
   const [showRowActions, setShowRowActions] = useState<string | null>(null);
+  const [showLightbox, setShowLightbox] = useState(false);
+  const [quickPanelCollapsed, setQuickPanelCollapsed] = useState(false);
 
   // שימוש ב-hook לחישובים אוטומטיים
   useOptionCalculations(option, quoteData, onUpdate);
@@ -382,6 +384,102 @@ export function QuoteOptionCard({
   const shippingPriceToClient = option.shippingPriceToClient || 0;
   const shippingCostPerPackage = includeShipping ? (shippingPriceToClient / packageQuantity) : 0;
 
+  // Lightbox Component
+  const ImageLightbox = () => {
+    if (!showLightbox || !option.image) return null;
+    
+    return (
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4"
+        onClick={() => setShowLightbox(false)}
+      >
+        <div className="relative max-w-5xl max-h-[90vh]">
+          <button
+            onClick={() => setShowLightbox(false)}
+            className="absolute -top-10 right-0 text-white text-2xl hover:text-gray-300"
+          >
+            ✕
+          </button>
+          <img 
+            src={option.image} 
+            alt={option.title}
+            className="max-w-full max-h-[90vh] object-contain rounded-lg"
+          />
+        </div>
+      </div>
+    );
+  };
+
+  // Quick Calculations Panel Component
+  const QuickCalculationsPanel = () => {
+    if (option.items.length === 0) return null;
+    
+    const profitColor = (option.actualProfitPercentage || 0) >= 0 ? 'text-green-600' : 'text-red-600';
+    const budgetColor = (option.budgetRemainingForProducts || 0) >= 0 ? 'text-green-600' : 'text-red-600';
+    const totalProfitColor = (option.totalDealProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600';
+    
+    return (
+      <div className="sticky top-0 z-40 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg shadow-md mb-4">
+        <div 
+          className="flex items-center justify-between p-3 cursor-pointer hover:bg-blue-100 transition-colors"
+          onClick={() => setQuickPanelCollapsed(!quickPanelCollapsed)}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-lg">📊</span>
+            <span className="font-bold text-blue-900">חישובים מהירים</span>
+          </div>
+          <ChevronDown 
+            className={`w-5 h-5 text-blue-700 transition-transform ${quickPanelCollapsed ? 'rotate-180' : ''}`}
+          />
+        </div>
+        
+        {!quickPanelCollapsed && (
+          <div className="px-4 pb-4 grid grid-cols-3 gap-3 text-sm">
+            {/* שורה ראשונה */}
+            <div className="bg-white p-2 rounded border border-blue-200">
+              <div className="text-gray-600 text-xs mb-1">יעד ריווחיות:</div>
+              <Input
+                type="number"
+                value={option.profitTarget || quoteData.profitTarget || 36}
+                onChange={(e) => onUpdate(option.id, { ...option, profitTarget: parseFloat(e.target.value) || 0 })}
+                className="text-base font-bold text-blue-900 h-8"
+              />
+            </div>
+            
+            <div className="bg-white p-2 rounded border border-blue-200">
+              <div className="text-gray-600 text-xs mb-1">רווח בפועל:</div>
+              <div className={`text-xl font-bold ${profitColor}`}>
+                {((option.actualProfitPercentage || 0) * 100).toFixed(2)}%
+              </div>
+            </div>
+            
+            <div className="bg-white p-2 rounded border border-blue-200">
+              <div className="text-gray-600 text-xs mb-1">עלות מוצרים:</div>
+              <div className="text-xl font-bold text-gray-900">
+                ₪{(option.productsCost || 0).toFixed(2)}
+              </div>
+            </div>
+            
+            {/* שורה שנייה */}
+            <div className="bg-white p-2 rounded border border-blue-200">
+              <div className="text-gray-600 text-xs mb-1">תקציב נותר:</div>
+              <div className={`text-xl font-bold ${budgetColor}`}>
+                {(option.budgetRemainingForProducts || 0) < 0 ? '-' : ''}₪{Math.abs(option.budgetRemainingForProducts || 0).toFixed(2)}
+              </div>
+            </div>
+            
+            <div className="bg-white p-2 rounded border border-blue-200 col-span-2">
+              <div className="text-gray-600 text-xs mb-1">סה"כ רווח לעסקה:</div>
+              <div className={`text-xl font-bold ${totalProfitColor}`}>
+                {(option.totalDealProfit || 0) < 0 ? '-' : ''}₪{Math.abs(option.totalDealProfit || 0).toFixed(2)}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <Card className={`bg-white border-2 shadow-lg hover:shadow-xl transition-all ${
       isIrrelevant ? 'border-gray-300' : 'border-blue-200'
@@ -433,24 +531,33 @@ export function QuoteOptionCard({
 
       {!option.isCollapsed && (
         <CardContent className="p-6">
+          <ImageLightbox />
+          
           <div
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
             className="min-h-[200px] rounded-lg border-2 border-dashed border-gray-200 hover:border-blue-300 transition-colors"
           >
+            <QuickCalculationsPanel />
             
             {option.image && (
-              <div className="mb-6 flex justify-center">
-                <div className="max-w-md">
+              <div className="mb-4 flex justify-center">
+                <div 
+                  className="relative cursor-pointer group"
+                  onClick={() => setShowLightbox(true)}
+                >
                   <img 
                     src={option.image} 
                     alt={option.title}
-                    className="w-full h-auto rounded-lg shadow-md border border-gray-200"
+                    className="h-40 w-auto rounded-lg shadow-md border-2 border-gray-200 group-hover:border-blue-400 transition-all"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
                     }}
                   />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-lg flex items-center justify-center">
+                    <span className="text-white opacity-0 group-hover:opacity-100 text-2xl">🔍</span>
+                  </div>
                 </div>
               </div>
             )}
