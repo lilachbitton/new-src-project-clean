@@ -141,7 +141,7 @@ export async function fetchActivePackages(): Promise<Package[]> {
         const packageData = {
           id: record.id,
           name: record.get('שם') as string || 'מארז ללא שם',
-          packageNumber: record.get('מספר מארז') as string || null, // הוסף מספר מארז
+          packageNumber: record.get('מספר מארז') as string || undefined, // הוסף מספר מארז
           packagePrice: Number(record.get('מחיר בש"ח')) || 0,
           items,
           packagingItems,
@@ -255,10 +255,10 @@ function determineProductType(productType?: string): 'product' | 'packaging' {
   if (!productType) return 'product';
   
   const brandingTypes = ['אריזה', 'מיתוג', 'קיטלוג'];
-  const type = productType.toLowerCase();
   
+  // השוואה ישירה ללא toLowerCase כי זה לא עובד עם עברית
   return brandingTypes.some(brandingType => 
-    type.includes(brandingType.toLowerCase())
+    productType.includes(brandingType)
   ) ? 'packaging' : 'product';
 }
 
