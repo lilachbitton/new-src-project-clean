@@ -138,17 +138,17 @@ export async function GET(request: NextRequest) {
       deliveryTime: opportunityData?.['שעת אספקה'] || '',
       
       // תקציב וכמויות
-      packageQuantity: fields['כמות מארזים'] || opportunityData?.['כמות מארזים'] || null,
-      budgetPerPackage: fields['תקציב למארז'] || opportunityData?.['תקציב'] || null,
-      budgetBeforeVAT: opportunityData?.['תקציב למארז לפני מע"מ'] || null,
-      budgetWithVAT: opportunityData?.['תקציב למארז כולל מעמ'] || null,
+      packageQuantity: fields['כמות מארזים'] || opportunityData?.['כמות מארזים'] || undefined,
+      budgetPerPackage: fields['תקציב למארז'] || opportunityData?.['תקציב'] || undefined,
+      budgetBeforeVAT: opportunityData?.['תקציב למארז לפני מע"מ'] || undefined,
+      budgetWithVAT: opportunityData?.['תקציב למארז כולל מעמ'] || undefined,
       includeVAT: opportunityData?.['מחירים כולל מע"מ'] || false,
       includeShipping: opportunityData?.['תקציב כולל משלוח'] || false,
       
       // רווחיות
       profitTarget: 36, // 36% כברירת מחדל
       agentCommission: (fields['עמלת סוכן'] || 0) * 100, // המרה מעשרוני לאחוזים (0.10 → 10)
-      agent: fields['סוכן'] || opportunityData?.['סוכן'] || null,
+      agent: fields['סוכן'] || opportunityData?.['סוכן'] || undefined,
       
       // פרטים נוספים
       deliveryAddress: opportunityData?.['כתובת אספקה'] || '',
@@ -168,7 +168,7 @@ export async function GET(request: NextRequest) {
       status: fields['סטאטוס'] || '',
       
       // הזדמנות מכירה
-      opportunityId: fields['הזדמנויות מכירה']?.[0] || null,
+      opportunityId: fields['הזדמנויות מכירה']?.[0] || undefined,
       occasion: opportunityData?.['מועד'] || [],
       
       // אופציות
@@ -229,7 +229,7 @@ function safeString(value: any): string {
   return String(value);
 }
 
-function safeValue(value: any, defaultVal: any = null): any {
+function safeValue(value: any, defaultVal: any = undefined): any {
   if (value === null || value === undefined) return defaultVal;
   if (typeof value === 'object' && !Array.isArray(value)) return defaultVal;
   if (Array.isArray(value)) return value[0] || defaultVal;
@@ -284,8 +284,8 @@ async function buildOptions(optionsData: any[]) {
         // משלוח - 9 שדות
         deliveryCompany: safeString(option['חברת משלוחים CLAUDE']),
         packaging: safeString(option['אריזה CLAUDE']),
-        unitsPerCarton: option['כמות שנכנסת בקרטון CLAUDE'] || null,
-        deliveryBoxesCount: option['כמות קרטונים להובלה CLAUDE'] || null,
+        unitsPerCarton: option['כמות שנכנסת בקרטון CLAUDE'] || undefined,
+        deliveryBoxesCount: option['כמות קרטונים להובלה CLAUDE'] || undefined,
         projectPriceBeforeVAT: option['תמחור לפרויקט לפני מע"מ CLAUDE'] || 0,
         projectPriceWithVAT: option['תמחור לפרויקט כולל מע"מ CLAUDE'] || 0,
         projectPriceToClientBeforeVAT: option['תמחור לפרויקט ללקוח לפני מע"מ CLAUDE'] || 0,
@@ -293,8 +293,8 @@ async function buildOptions(optionsData: any[]) {
         shippingPriceToClient: option['תמחור משלוח ללקוח CLAUDE'] || 0,
         
         // מארז ותמונה
-        packageNumber: option['מספר מארז'] || null,
-        image: option['תמונת מארז']?.[0]?.url || null,
+        packageNumber: option['מספר מארז'] || undefined,
+        image: option['תמונת מארז']?.[0]?.url || undefined,
         
         // סטטוס
         status: safeString(option['סטאטוס']),
@@ -352,7 +352,7 @@ async function fetchProducts(productIds: string[], type: 'product' | 'packaging'
             type,
             productType: record.fields['סוג מוצר'] || '',
             inventory: record.fields['current inventory'] || '',
-            boxesPerCarton: record.fields['כמות בקרטון'] || null,
+            boxesPerCarton: record.fields['כמות בקרטון'] || undefined,
           };
         }
         return null;

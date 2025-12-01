@@ -17,11 +17,11 @@ export interface QuoteOption {
   id: string;
   airtableId?: string; // ID מאיירטייבל
   packageId?: string; // ID של המארז מאיירטייבל
-  packageNumber?: string | null; // מספר מארז - להפעלת אוטומציה של תמונה
+  packageNumber?: string | undefined; // מספר מארז - להפעלת אוטומציה של תמונה
   title: string;
   items: Item[];
   total: number;
-  image?: string | null;
+  image?: string | undefined;
   
   // Calculation fields
   profitTarget?: number; // יעד רווחיות
@@ -80,17 +80,17 @@ export interface QuoteData {
   deliveryTime?: string;
   
   // Budget fields
-  budgetBeforeVAT: number | null;
-  budgetWithVAT: number | null;
-  budgetPerPackage?: number | null;
-  packageQuantity?: number | null;
+  budgetBeforeVAT: number | undefined;
+  budgetWithVAT: number | undefined;
+  budgetPerPackage?: number | undefined;
+  packageQuantity?: number | undefined;
   includeVAT?: boolean;
   includeShipping?: boolean;
   
   // Profitability
   profitTarget?: number;
   agentCommission?: number;
-  agent?: string | null;
+  agent?: string | undefined;
   
   // Delivery
   deliveryAddress?: string;
@@ -108,7 +108,7 @@ export interface QuoteData {
   status?: string;
   
   // Opportunity
-  opportunityId?: string | null;
+  opportunityId?: string | undefined;
   occasion?: string[];
   
   // Options
@@ -130,7 +130,7 @@ export interface Product {
 export interface Package {
   id: string;
   name: string;
-  packageNumber?: string | null;
+  packageNumber?: string | undefined;
   packagePrice?: number;
   items: Product[];
   packagingItems?: Product[];

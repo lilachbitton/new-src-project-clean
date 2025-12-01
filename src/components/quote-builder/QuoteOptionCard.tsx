@@ -89,7 +89,7 @@ export function QuoteOptionCard({
 
         // מצא את מוצר האריזה מתוך המארז
         let packagingName = '';
-        let unitsPerCarton = null;
+        let unitsPerCarton: number | undefined = undefined;
         
         if (itemData.packagingItems) {
           const packagingItem = itemData.packagingItems.find((item: any) => 
@@ -98,7 +98,7 @@ export function QuoteOptionCard({
           
           if (packagingItem) {
             packagingName = packagingItem.marketingDescription || packagingItem.name || '';
-            unitsPerCarton = packagingItem.boxesPerCarton || null;
+            unitsPerCarton = packagingItem.boxesPerCarton || undefined;
             console.log('📦 נמצא מוצר אריזה:', packagingName, 'כמות בקרטון:', unitsPerCarton);
           }
         }
@@ -147,11 +147,11 @@ export function QuoteOptionCard({
         
         // אם זה מוצר אריזה - עדכן את השדות packaging ו-unitsPerCarton
         let packagingName = option.packaging || '';
-        let unitsPerCarton = option.unitsPerCarton || null;
+        let unitsPerCarton: number | undefined = option.unitsPerCarton;
         
         if (newItem.type === 'packaging' && itemData.productType === 'אריזה') {
           packagingName = itemData.marketingDescription || itemData.name || '';
-          unitsPerCarton = itemData.boxesPerCarton || null;
+          unitsPerCarton = itemData.boxesPerCarton || undefined;
           console.log('✅ מעדכן שדות אריזה:', { packagingName, unitsPerCarton });
         }
 
