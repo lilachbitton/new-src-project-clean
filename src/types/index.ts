@@ -95,6 +95,7 @@ export interface QuoteData {
   // Delivery
   deliveryAddress?: string;
   deliveryType?: string;
+  distribution?: string; // הפצה מהזדמנות המכירה
   
   // Customer preferences
   celebration?: string;

@@ -8,9 +8,10 @@ import { ChevronDown } from 'lucide-react';
 interface ShippingSectionProps {
   option: QuoteOption;
   onUpdate: (optionId: string, updatedOption: QuoteOption) => void;
+  distribution?: string; // הפצה מהזדמנות המכירה
 }
 
-export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
+export function ShippingSection({ option, onUpdate, distribution }: ShippingSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const deliveryCompanies = [
@@ -86,6 +87,14 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
           <div className="bg-white p-3 rounded border border-purple-100">
             <div className="text-xs font-semibold text-purple-600 mb-2">מידע כללי</div>
             <div className="grid grid-cols-2 gap-3">
+              {distribution && (
+                <div className="col-span-2">
+                  <label className="block text-xs text-gray-600 mb-1">הפצה</label>
+                  <div className="text-sm p-2 bg-blue-50 rounded border border-blue-200 font-medium">
+                    {distribution}
+                  </div>
+                </div>
+              )}
               <div>
                 <label className="block text-xs text-gray-600 mb-1">כמות שנכנסת בקרטון</label>
                 <div className="text-sm font-semibold p-2 bg-gray-50 rounded border">

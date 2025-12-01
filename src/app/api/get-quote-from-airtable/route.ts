@@ -153,6 +153,7 @@ export async function GET(request: NextRequest) {
       // פרטים נוספים
       deliveryAddress: opportunityData?.['כתובת אספקה'] || '',
       deliveryType: opportunityData?.['הפצה'] || '',
+      distribution: opportunityData?.['הפצה'] || '', // הפצה - לתצוגה בלבד
       customerNotes: fields['איש קשר'] || opportunityData?.['דגשים מהלקוח'] || '',
       customerPreferences: opportunityData?.['דגשים והעדפות'] || '',
       celebration: opportunityData?.['מה חוגגים'] || '',
