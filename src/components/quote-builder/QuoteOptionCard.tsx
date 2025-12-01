@@ -692,7 +692,7 @@ export function QuoteOptionCard({
                     </div>
                     
                     <div className="flex justify-between py-1">
-                      <Tooltip content={`(${budgetPerPackage.toFixed(2)} × ${packageQuantity}) + ${(option.projectPriceBeforeVAT || quoteData.projectPriceBeforeVAT || 0).toFixed(2)} = ${(option.revenueWithoutVAT || 0).toFixed(2)}`}>
+                      <Tooltip content={`(${budgetPerPackage.toFixed(2)} × ${packageQuantity}) + ${(option.projectPriceToClientBeforeVAT || 0).toFixed(2)} = ${(option.revenueWithoutVAT || 0).toFixed(2)}`}>
                         <span className="text-gray-700 font-medium">הכנסה ללא מע"מ:</span>
                       </Tooltip>
                       <span className="font-bold text-blue-700">₪{(option.revenueWithoutVAT || 0).toFixed(2)}</span>
