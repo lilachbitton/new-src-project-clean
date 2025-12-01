@@ -51,18 +51,45 @@ export function useOptionCalculations(
     const finalDeliveryBoxes = option.finalDeliveryBoxes ?? deliveryBoxesCount;
 
     // חישוב פירוט החלוקה אוטומטי
-    const packagesInFinalBoxes = finalDeliveryBoxes * unitsPerCarton;
-    const remainingPackages = packageQuantity - packagesInFinalBoxes;
+    const fullBoxes = Math.floor(packageQuantity / unitsPerCarton); // קרטונים מלאים
+    const remainingInPartialBox = packageQuantity % unitsPerCarton; // מארזים שנשארו בקרטון חלקי
     
     let deliveryBreakdown = '';
-    if (remainingPackages > 0) {
-      deliveryBreakdown = `${finalDeliveryBoxes} קרטונים + ${remainingPackages} מארזים ללא קרטון`;
-    } else if (remainingPackages < 0) {
-      // אם הזינו יותר מדי קרטונים
-      deliveryBreakdown = `${finalDeliveryBoxes} קרטונים (יותר מדי!)`;
-    } else {
+    
+    if (finalDeliveryBoxes > fullBoxes) {
+      // יש לנו יותר קרטונים ממה שצריך
+      const parts = [];
+      
+      if (fullBoxes > 0) {
+        parts.push(`${fullBoxes} קרטונים מלאים`);
+      }
+      
+      if (remainingInPartialBox > 0) {
+        // יש קרטון חלקי
+        parts.push(`קרטון עם ${remainingInPartialBox === 1 ? 'מארז אחד' : `${remainingInPartialBox} מארזים`}`);
+      }
+      
+      const emptyBoxes = finalDeliveryBoxes - fullBoxes - (remainingInPartialBox > 0 ? 1 : 0);
+      if (emptyBoxes > 0) {
+        parts.push(emptyBoxes === 1 ? 'קרטון ריק' : `${emptyBoxes} קרטונים ריקים`);
+      }
+      
+      deliveryBreakdown = parts.join(' + ');
+      
+    } else if (finalDeliveryBoxes === fullBoxes && remainingInPartialBox === 0) {
       // חלוקה מושלמת
       deliveryBreakdown = `${finalDeliveryBoxes} קרטונים מלאים`;
+      
+    } else {
+      // יש לנו פחות קרטונים ממה שצריך, או שווה אבל יש שארית
+      const packagesInFinalBoxes = finalDeliveryBoxes * unitsPerCarton;
+      const packagesWithoutBoxes = packageQuantity - packagesInFinalBoxes;
+      
+      if (packagesWithoutBoxes > 0) {
+        deliveryBreakdown = `${finalDeliveryBoxes} קרטונים + ${packagesWithoutBoxes === 1 ? 'מארז אחד' : `${packagesWithoutBoxes} מארזים`} ללא קרטון`;
+      } else {
+        deliveryBreakdown = `${finalDeliveryBoxes} קרטונים מלאים`;
+      }
     }
 
     // חישובי תמחור לפרויקט - משתמשים ב"תמחור משלוח ללקוח" (לא מחיר מהספק!)
