@@ -645,52 +645,82 @@ export function QuoteOptionCard({
                       <span className="text-gray-600">עמלת סוכן %:</span>
                       <span className="font-semibold">{option.agentCommission || quoteData.agentCommission || 0}%</span>
                     </div>
+                    
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <span className="text-gray-600">מחיר עלות:</span>
+                      <Tooltip content="תקציב למארז לאחר משלוח × (1 - יעד רווחיות - עמלת סוכן %)">
+                        <span className="text-gray-600">מחיר עלות:</span>
+                      </Tooltip>
                       <span className="font-semibold">₪{(option.costPrice || 0).toFixed(2)}</span>
                     </div>
+                    
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <span className="text-gray-600">עלות עבודת אריזה:</span>
+                      <Tooltip content="כמות מוצרים × 0.5 + (אם יש קופסת: 2, אחרת: 1)">
+                        <span className="text-gray-600">עלות עבודת אריזה:</span>
+                      </Tooltip>
                       <span className="font-semibold">₪{(option.packagingWorkCost || 0).toFixed(2)}</span>
                     </div>
+                    
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <span className="text-gray-600">עלות מוצרי אריזה ומיתוג:</span>
+                      <Tooltip content="סכום כל מוצרי האריזה והמיתוג">
+                        <span className="text-gray-600">עלות מוצרי אריזה ומיתוג:</span>
+                      </Tooltip>
                       <span className="font-semibold">₪{(option.packagingItemsCost || 0).toFixed(2)}</span>
                     </div>
+                    
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <span className="text-gray-600">עלות מוצרים בפועל:</span>
+                      <Tooltip content="סכום כל המוצרים (לא כולל אריזה ומיתוג)">
+                        <span className="text-gray-600">עלות מוצרים בפועל:</span>
+                      </Tooltip>
                       <span className="font-semibold">₪{(option.productsCost || 0).toFixed(2)}</span>
                     </div>
+                    
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <span className="text-gray-600">תקציב נותר למוצרים:</span>
+                      <Tooltip content="מחיר עלות - (הובלה במארז + עלות מוצרים + עלות מוצרי אריזה + הוצאות נוספות + עלות עבודת אריזה)">
+                        <span className="text-gray-600">תקציב נותר למוצרים:</span>
+                      </Tooltip>
                       <span className={`font-semibold ${(option.budgetRemainingForProducts || 0) < 0 ? 'text-red-600' : ''}`}>
                         {(option.budgetRemainingForProducts || 0) < 0 ? '-' : ''}₪{Math.abs(option.budgetRemainingForProducts || 0).toFixed(2)}
                       </span>
                     </div>
+                    
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <span className="text-gray-600">כמות מוצרים:</span>
+                      <Tooltip content="כמות המוצרים באופציה (לא כולל מוצרי אריזה)">
+                        <span className="text-gray-600">כמות מוצרים:</span>
+                      </Tooltip>
                       <span className="font-semibold">{option.productQuantity || 0}</span>
                     </div>
+                    
                     <div className="flex justify-between py-1 border-b border-blue-100">
-                      <span className="text-gray-600">% רווח בפועל למארז:</span>
+                      <Tooltip content="(רווח לעסקה ÷ תקציב למארז לאחר משלוח) × 100">
+                        <span className="text-gray-600">% רווח בפועל למארז:</span>
+                      </Tooltip>
                       <span className={`font-semibold ${(option.actualProfitPercentage || 0) < 0 ? 'text-red-600' : 'text-green-600'}`}>
                         {(option.actualProfitPercentage || 0) < 0 ? '-' : ''}{Math.abs((option.actualProfitPercentage || 0) * 100).toFixed(2)}%
                       </span>
                     </div>
+                    
                     <div className="flex justify-between py-1 border-b border-green-100">
-                      <span className="text-gray-700 font-medium">רווח לעסקה בשקלים:</span>
+                      <Tooltip content="תקציב למארז לאחר משלוח - הובלה במארז - עלות מוצרים - הוצאות נוספות - עלות מוצרי אריזה - עלות עבודת אריזה - (עמלת סוכן × תקציב למארז)">
+                        <span className="text-gray-700 font-medium">רווח לעסקה בשקלים:</span>
+                      </Tooltip>
                       <span className={`font-bold ${(option.profitPerDeal || 0) < 0 ? 'text-red-700' : 'text-green-700'}`}>
                         {(option.profitPerDeal || 0) < 0 ? '-' : ''}₪{Math.abs(option.profitPerDeal || 0).toFixed(2)}
                       </span>
                     </div>
+                    
                     <div className="flex justify-between py-1 border-b border-green-100">
-                      <span className="text-gray-700 font-medium">סה"כ רווח לעסקה:</span>
+                      <Tooltip content="כמות מארזים × רווח לעסקה בשקלים">
+                        <span className="text-gray-700 font-medium">סה"כ רווח לעסקה:</span>
+                      </Tooltip>
                       <span className={`font-bold ${(option.totalDealProfit || 0) < 0 ? 'text-red-700' : 'text-green-700'}`}>
                         {(option.totalDealProfit || 0) < 0 ? '-' : ''}₪{Math.abs(option.totalDealProfit || 0).toFixed(2)}
                       </span>
                     </div>
+                    
                     <div className="flex justify-between py-1">
-                      <span className="text-gray-700 font-medium">הכנסה ללא מע"מ:</span>
+                      <Tooltip content="(תקציב למארז לפני מע''מ × כמות מארזים) + תמחור לפרויקט ללקוח לפני מע''מ">
+                        <span className="text-gray-700 font-medium">הכנסה ללא מע"מ:</span>
+                      </Tooltip>
                       <span className="font-bold text-blue-700">₪{(option.revenueWithoutVAT || 0).toFixed(2)}</span>
                     </div>
                   </div>
