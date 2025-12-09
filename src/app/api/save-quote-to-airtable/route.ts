@@ -254,6 +254,17 @@ export async function POST(request: NextRequest) {
       if (quoteData.deliveryAddress) fields['כתובת אספקה'] = quoteData.deliveryAddress;
       if (quoteData.deliveryDate) fields['תאריך אספקה מבוקש'] = quoteData.deliveryDate;
       if (quoteData.distribution) fields['הפצה'] = quoteData.distribution;
+      
+      // שמור סוכן ועמלת סוכן ברמת ההזדמנות
+      if (quoteData.agent) {
+        fields['סוכן'] = quoteData.agent;
+        console.log('👤 שומר סוכן בהזדמנות:', quoteData.agent);
+      }
+      if (quoteData.agentCommission !== null && quoteData.agentCommission !== undefined) {
+        const commissionAsDecimal = quoteData.agentCommission / 100; // המרה מאחוזים לעשרוני (10 → 0.10)
+        fields['עמלת סוכן'] = commissionAsDecimal;
+        console.log('💵 שומר עמלת סוכן בהזדמנות:', quoteData.agentCommission, '→', commissionAsDecimal);
+      }
 
       console.log('🔄 מעדכן הזדמנות מכירה:', quoteData.opportunityId);
 
