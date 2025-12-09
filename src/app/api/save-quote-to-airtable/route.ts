@@ -136,11 +136,9 @@ export async function POST(request: NextRequest) {
         if (option.finalDeliveryBoxes !== undefined) fields['כמות קרטונים סופית להובלה'] = option.finalDeliveryBoxes;
         if (option.deliveryBreakdown) fields['פירוט החלוקה'] = option.deliveryBreakdown;
 
-        // קביעת סטטוס
-        if (option.isSelected) {
-          fields['סטאטוס'] = 'אופציה מאושרת לשליחה';
-        } else if (option.isIrrelevant) {
-          fields['סטאטוס'] = 'אופציה לא רלוונטית';
+        // שמור סטטוס אם הוגדר במפורש, אחרת קבע לפי מצב
+        if (option.status) {
+          fields['סטאטוס'] = option.status;
         } else if (option.items && option.items.length > 0) {
           fields['סטאטוס'] = 'אופציה בעבודה';
         } else if (option.packageId && isValidRecordId(option.packageId)) {
@@ -220,11 +218,9 @@ export async function POST(request: NextRequest) {
         if (option.finalDeliveryBoxes !== undefined) fields['כמות קרטונים סופית להובלה'] = option.finalDeliveryBoxes;
         if (option.deliveryBreakdown) fields['פירוט החלוקה'] = option.deliveryBreakdown;
 
-        // קביעת סטטוס
-        if (option.isSelected) {
-          fields['סטאטוס'] = 'אופציה מאושרת לשליחה';
-        } else if (option.isIrrelevant) {
-          fields['סטאטוס'] = 'אופציה לא רלוונטית';
+        // שמור סטטוס אם הוגדר במפורש, אחרת קבע לפי מצב
+        if (option.status) {
+          fields['סטאטוס'] = option.status;
         } else if (productIds.length > 0 || packagingIds.length > 0) {
           fields['סטאטוס'] = 'אופציה בעבודה';
         } else if (option.packageId && isValidRecordId(option.packageId)) {
