@@ -52,6 +52,7 @@ export function useQuoteData(initialData?: QuoteData | null) {
       items: [],
       total: 0,
       additionalExpenses: 16, // ברירת מחדל 16 ש"ח
+      agentCommission: quoteData.agentCommission || 0, // העמלה מההזדמנות
       isCollapsed: false,
       isIrrelevant: false,
     };
@@ -212,6 +213,7 @@ export function useQuoteData(initialData?: QuoteData | null) {
         items: [],
         total: 0,
         additionalExpenses: 16, // ברירת מחדל 16 ש"ח
+        agentCommission: 0, // ברירת מחדל של עמלה
         isCollapsed: false,
         isIrrelevant: false,
       }],

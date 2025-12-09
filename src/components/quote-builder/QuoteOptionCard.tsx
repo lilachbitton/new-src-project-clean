@@ -696,18 +696,15 @@ export function QuoteOptionCard({
                     </div>
                     <div>
                       <label className="block text-xs text-gray-600 mb-1">סוכן</label>
-                      <Input
-                        value={option.agent || quoteData.agent || ""}
-                        onChange={(e) => onUpdate(option.id, { ...option, agent: e.target.value })}
-                        placeholder="שם הסוכן"
-                        className="text-sm"
-                      />
+                      <div className="px-3 py-2 text-sm bg-gray-100 border border-gray-300 rounded-md text-gray-700">
+                        {quoteData.agent || "ללא סוכן"}
+                      </div>
                     </div>
                     <div>
                       <label className="block text-xs text-gray-600 mb-1">עמלת סוכן (%)</label>
                       <Input
                         type="number"
-                        value={option.agentCommission || quoteData.agentCommission || 0}
+                        value={option.agentCommission !== undefined ? option.agentCommission : (quoteData.agentCommission || 0)}
                         onChange={(e) => onUpdate(option.id, { ...option, agentCommission: parseFloat(e.target.value) || 0 })}
                         placeholder="0"
                         className="text-sm"

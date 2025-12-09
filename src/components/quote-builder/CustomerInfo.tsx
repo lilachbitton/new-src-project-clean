@@ -100,6 +100,34 @@ export function CustomerInfo({ quoteData, onUpdate }: CustomerInfoProps) {
           תקציב
         </h3>
         <div className="space-y-3">
+          {/* סוכן ועמלת סוכן */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">סוכן</label>
+              <select
+                value={quoteData.agent || ""}
+                onChange={(e) => updateField('agent', e.target.value)}
+                className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md"
+              >
+                <option value="">ללא סוכן</option>
+                <option value="תו 8">תו 8</option>
+                <option value="גיא ליבוביץ">גיא ליבוביץ</option>
+                <option value="לורן">לורן</option>
+                <option value="ניקלס">ניקלס</option>
+                <option value="ללא">ללא</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">עמלת סוכן (%)</label>
+              <Input
+                type="number"
+                value={quoteData.agentCommission || ""}
+                onChange={(e) => updateField('agentCommission', e.target.value ? parseFloat(e.target.value) : 0)}
+                placeholder="0"
+                className="text-sm"
+              />
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">כמות מארזים</label>
