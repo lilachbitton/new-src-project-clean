@@ -584,7 +584,8 @@ export function QuoteOptionCard({
             )}
             
             {(option.packageNumber || option.packageId || option.packaging || option.unitsPerCarton) && (
-<div className="hidden bg-purple-50 p-3 rounded-lg border border-purple-200 mb-4">                <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="hidden bg-purple-50 p-3 rounded-lg border border-purple-200 mb-4">
+                <div className="grid grid-cols-2 gap-4 text-sm">
                   {option.packageNumber && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">מספר מארז:</span>
@@ -846,7 +847,8 @@ export function QuoteOptionCard({
                   </div>
                 </div>
 
-<div className="hidden bg-gradient-to-r from-blue-600 to-blue-500 p-4 rounded-lg shadow-md">                  <div className="flex justify-between items-center text-white">
+              <div className="hidden bg-gradient-to-r from-blue-600 to-blue-500 p-4 rounded-lg shadow-md">
+                <div className="flex justify-between items-center text-white">
                     <span className="text-lg font-bold">מחיר עלות סופי:</span>
                     <span className="text-3xl font-bold">
                       ₪{option.items.reduce((sum, item) => sum + (item.price || 0), 0).toFixed(2)}
