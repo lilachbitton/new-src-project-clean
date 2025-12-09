@@ -53,19 +53,10 @@ export function QuoteOptionCard({
     onUpdate(option.id, { ...option, isCollapsed: !option.isCollapsed });
   };
 
-  const handleToggleIrrelevant = () => {
-    const newIrrelevant = !option.isIrrelevant;
+  const handleStatusChange = (newStatus: string) => {
     onUpdate(option.id, { 
       ...option, 
-      isIrrelevant: newIrrelevant,
-      isCollapsed: newIrrelevant ? true : option.isCollapsed 
-    });
-  };
-
-  const handleToggleSelected = () => {
-    onUpdate(option.id, { 
-      ...option, 
-      isSelected: !option.isSelected
+      status: newStatus
     });
   };
 
@@ -511,25 +502,28 @@ export function QuoteOptionCard({
             />
           </Button>
           
-          <label className="flex items-center gap-1">
-            <input
-              type="checkbox"
-              checked={option.isIrrelevant || false}
-              onChange={handleToggleIrrelevant}
-              className="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300"
-            />
-            <span className="text-sm">לא רלוונטי</span>
-          </label>
-          
-          <label className="flex items-center gap-1 mr-2">
-            <input
-              type="checkbox"
-              checked={option.isSelected || false}
-              onChange={handleToggleSelected}
-              className="form-checkbox h-4 w-4 text-green-600 rounded border-gray-300"
-            />
-            <span className="text-sm text-green-700 font-semibold">אופציה נבחרת ✓</span>
-          </label>
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700">סטטוס:</label>
+            <select
+              value={option.status || 'אופציה בעבודה'}
+              onChange={(e) => handleStatusChange(e.target.value)}
+              className="px-3 py-1 text-sm border border-gray-300 rounded-md bg-white hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="מחכה לבניית אופציה">מחכה לבניית אופציה</option>
+              <option value="אופציה בעבודה">אופציה בעבודה</option>
+              <option value="אופציה מאושרת לשליחה">אופציה מאושרת לשליחה</option>
+              <option value="נשלחה הצעה ללקוח">נשלחה הצעה ללקוח</option>
+              <option value="לאישור בתאל">לאישור בתאל</option>
+              <option value="מאושר בתאל">מאושר בתאל</option>
+              <option value="אופציה לא רלוונטית">אופציה לא רלוונטית</option>
+              <option value="כיוון חיובי">כיוון חיובי</option>
+              <option value="לקראת סגירה">לקראת סגירה</option>
+              <option value="בתיקון">בתיקון</option>
+              <option value="אופציה אושרה ע\"י הלקוח">אופציה אושרה ע"י הלקוח</option>
+              <option value="אופציה לאחר תיקון">אופציה לאחר תיקון</option>
+              <option value="הצעה בהולד">הצעה בהולד</option>
+            </select>
+          </div>
         </div>
         
         <Input
