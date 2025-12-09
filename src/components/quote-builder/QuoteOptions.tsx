@@ -44,6 +44,28 @@ export function QuoteOptions({
   return (
     <div className="space-y-6">
       
+      {/* Floating Add Button - always visible */}
+      <button
+        onClick={onAddOption}
+        className="fixed bottom-8 left-8 z-50 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+        title="הוסף אופציה חדשה"
+      >
+        <Plus className="w-6 h-6" />
+      </button>
+      
+      {/* Header with Add Option button */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold text-gray-800">אופציות ({relevantOptions.length})</h2>
+        <Button 
+          onClick={onAddOption}
+          className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
+          size="sm"
+        >
+          <Plus className="w-4 h-4 ml-2" />
+          הוסף אופציה
+        </Button>
+      </div>
+      
       {/* Relevant Options */}
       <div className="grid grid-cols-2 gap-6">
         {relevantOptions.map((option) => (
