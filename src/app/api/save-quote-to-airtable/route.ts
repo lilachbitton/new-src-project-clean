@@ -262,7 +262,7 @@ export async function POST(request: NextRequest) {
       }
       if (quoteData.agentCommission !== null && quoteData.agentCommission !== undefined) {
         const commissionAsDecimal = quoteData.agentCommission / 100; // המרה מאחוזים לעשרוני (10 → 0.10)
-        fields['עמלת סוכן'] = commissionAsDecimal;
+        fields['עמלת סוכן %'] = commissionAsDecimal;
         console.log('💵 שומר עמלת סוכן בהזדמנות:', quoteData.agentCommission, '→', commissionAsDecimal);
       }
 

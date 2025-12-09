@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
       // רווחיות
       profitTarget: 36, // 36% כברירת מחדל
       agent: opportunityData?.['סוכן'] || '', // סוכן מהזדמנות מכירה
-      agentCommission: opportunityData?.['עמלת סוכן'] || 0, // עמלת סוכן מהזדמנות מכירה
+      agentCommission: (opportunityData?.['עמלת סוכן %'] || 0) * 100, // המרה מעשרוני לאחוזים (0.10 → 10)
       
       // פרטים נוספים
       deliveryAddress: opportunityData?.['כתובת אספקה'] || '',
