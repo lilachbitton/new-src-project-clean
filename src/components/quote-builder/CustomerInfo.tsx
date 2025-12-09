@@ -129,6 +129,14 @@ export function CustomerInfo({ quoteData, onUpdate }: CustomerInfoProps) {
               className="text-sm"
             />
           </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">מועד (רק קריאה)</label>
+            <div className="text-sm px-3 py-2 border rounded-md bg-gray-50 text-gray-700">
+              {quoteData.occasion && quoteData.occasion.length > 0 
+                ? quoteData.occasion.join(', ') 
+                : 'ללא מועד'}
+            </div>
+          </div>
         </div>
       </div>
 

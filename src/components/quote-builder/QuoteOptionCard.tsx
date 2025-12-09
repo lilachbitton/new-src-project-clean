@@ -62,6 +62,13 @@ export function QuoteOptionCard({
     });
   };
 
+  const handleToggleSelected = () => {
+    onUpdate(option.id, { 
+      ...option, 
+      isSelected: !option.isSelected
+    });
+  };
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     try {
@@ -512,6 +519,16 @@ export function QuoteOptionCard({
               className="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300"
             />
             <span className="text-sm">לא רלוונטי</span>
+          </label>
+          
+          <label className="flex items-center gap-1 mr-2">
+            <input
+              type="checkbox"
+              checked={option.isSelected || false}
+              onChange={handleToggleSelected}
+              className="form-checkbox h-4 w-4 text-green-600 rounded border-gray-300"
+            />
+            <span className="text-sm text-green-700 font-semibold">אופציה נבחרת ✓</span>
           </label>
         </div>
         

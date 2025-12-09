@@ -133,9 +133,13 @@ export async function POST(request: NextRequest) {
         if (option.deliveryCompany) fields['חברת משלוחים CLAUDE'] = option.deliveryCompany;
         if (option.projectPriceBeforeVAT !== undefined) fields['תמחור לפרויקט לפני מע"מ CLAUDE'] = option.projectPriceBeforeVAT;
         if (option.shippingPriceToClient !== undefined) fields['תמחור משלוח ללקוח CLAUDE'] = option.shippingPriceToClient;
+        if (option.finalDeliveryBoxes !== undefined) fields['כמות קרטונים סופית להובלה'] = option.finalDeliveryBoxes;
+        if (option.deliveryBreakdown) fields['פירוט החלוקה'] = option.deliveryBreakdown;
 
         // קביעת סטטוס
-        if (option.isIrrelevant) {
+        if (option.isSelected) {
+          fields['סטאטוס'] = 'אופציה מאושרת לשליחה';
+        } else if (option.isIrrelevant) {
           fields['סטאטוס'] = 'אופציה לא רלוונטית';
         } else if (option.items && option.items.length > 0) {
           fields['סטאטוס'] = 'אופציה בעבודה';
@@ -208,9 +212,18 @@ export async function POST(request: NextRequest) {
         const packagingIds = option.items?.filter((i: any) => i.type === 'packaging' && isValidRecordId(i.id)).map((i: any) => i.id) || [];
         if (productIds.length) fields['מוצרים'] = productIds;
         if (packagingIds.length) fields['מוצרי אריזה ומיתוג copy'] = packagingIds;
+        
+        // שדות משלוח
+        if (option.deliveryCompany) fields['חברת משלוחים CLAUDE'] = option.deliveryCompany;
+        if (option.projectPriceBeforeVAT !== undefined) fields['תמחור לפרויקט לפני מע"מ CLAUDE'] = option.projectPriceBeforeVAT;
+        if (option.shippingPriceToClient !== undefined) fields['תמחור משלוח ללקוח CLAUDE'] = option.shippingPriceToClient;
+        if (option.finalDeliveryBoxes !== undefined) fields['כמות קרטונים סופית להובלה'] = option.finalDeliveryBoxes;
+        if (option.deliveryBreakdown) fields['פירוט החלוקה'] = option.deliveryBreakdown;
 
         // קביעת סטטוס
-        if (option.isIrrelevant) {
+        if (option.isSelected) {
+          fields['סטאטוס'] = 'אופציה מאושרת לשליחה';
+        } else if (option.isIrrelevant) {
           fields['סטאטוס'] = 'אופציה לא רלוונטית';
         } else if (productIds.length > 0 || packagingIds.length > 0) {
           fields['סטאטוס'] = 'אופציה בעבודה';
@@ -264,6 +277,12 @@ export async function POST(request: NextRequest) {
         const commissionAsDecimal = quoteData.agentCommission / 100; // המרה מאחוזים לעשרוני (10 → 0.10)
         fields['עמלת סוכן %'] = commissionAsDecimal;
         console.log('💵 שומר עמלת סוכן בהזדמנות:', quoteData.agentCommission, '→', commissionAsDecimal);
+      }
+      
+      // שמור מועד (שדה מקושר)
+      if (quoteData.occasion && Array.isArray(quoteData.occasion) && quoteData.occasion.length > 0) {
+        fields['מועד'] = quoteData.occasion;
+        console.log('📅 שומר מועד בהזדמנות:', quoteData.occasion);
       }
 
       console.log('🔄 מעדכן הזדמנות מכירה:', quoteData.opportunityId);

@@ -286,6 +286,8 @@ async function buildOptions(optionsData: any[]) {
         packaging: safeString(option['אריזה CLAUDE']),
         unitsPerCarton: option['כמות שנכנסת בקרטון CLAUDE'] || undefined,
         deliveryBoxesCount: option['כמות קרטונים להובלה CLAUDE'] || undefined,
+        finalDeliveryBoxes: option['כמות קרטונים סופית להובלה'] || undefined,
+        deliveryBreakdown: safeString(option['פירוט החלוקה']),
         projectPriceBeforeVAT: option['תמחור לפרויקט לפני מע"מ CLAUDE'] || 0,
         projectPriceWithVAT: option['תמחור לפרויקט כולל מע"מ CLAUDE'] || 0,
         projectPriceToClientBeforeVAT: option['תמחור לפרויקט ללקוח לפני מע"מ CLAUDE'] || 0,
@@ -303,6 +305,7 @@ async function buildOptions(optionsData: any[]) {
         // UI
         isCollapsed: false,
         isIrrelevant: safeString(option['סטאטוס']) === 'אופציה לא רלוונטית',
+        isSelected: safeString(option['סטאטוס']) === 'אופציה מאושרת לשליחה',
       };
 
       options.push(optionData);

@@ -60,6 +60,7 @@ export interface QuoteOption {
   // Status fields
   status?: string;
   internalStatus?: string;
+  isSelected?: boolean; // אופציה נבחרת
   
   // UI state
   isCollapsed?: boolean;
