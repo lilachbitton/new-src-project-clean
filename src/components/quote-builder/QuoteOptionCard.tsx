@@ -385,7 +385,7 @@ export function QuoteOptionCard({
   const totalProfitColor = (option.totalDealProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600';
 
   return (
-    <>
+    <React.Fragment>
       {showLightbox && option.image && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4"
@@ -803,6 +803,6 @@ export function QuoteOptionCard({
           </CardContent>
         )}
       </Card>
-    </>
+    </React.Fragment>
   );
 }
