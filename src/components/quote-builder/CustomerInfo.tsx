@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { QuoteData } from '@/types';
 
@@ -10,6 +10,50 @@ interface CustomerInfoProps {
 }
 
 export function CustomerInfo({ quoteData, onUpdate }: CustomerInfoProps) {
+  // שמור את הערך הקודם של עמלת הסוכן
+  const prevAgentCommissionRef = useRef<number | undefined>(quoteData?.agentCommission);
+  
+  // אתחל את ה-ref כשטוענים נתונים מאיירטייבל
+  useEffect(() => {
+    if (quoteData && prevAgentCommissionRef.current === undefined) {
+      prevAgentCommissionRef.current = quoteData.agentCommission || 0;
+      console.log('🆕 איתחול עמלת סוכן התחלתית:', prevAgentCommissionRef.current);
+    }
+  }, [quoteData?.agentCommission]);
+  
+  // עדכן עמלת סוכן בכל האופציות כשהיא משתנה
+  useEffect(() => {
+    if (!quoteData) return;
+    
+    const currentCommission = quoteData.agentCommission || 0;
+    const prevCommission = prevAgentCommissionRef.current || 0;
+    
+    // אם העמלה השתנתה
+    if (currentCommission !== prevCommission) {
+      console.log('🔄 עמלת סוכן השתנתה:', prevCommission, '→', currentCommission);
+      
+      // בדוק אם יש אופציות שצריך לעדכן
+      let hasChanges = false;
+      const updatedOptions = quoteData.options.map(option => {
+        // אם האופציה משתמשת בערך הקודם (לא שונתה ידנית)
+        if ((option.agentCommission || 0) === prevCommission) {
+          console.log(`✅ מעדכן אופציה ${option.id} מ-${prevCommission} ל-${currentCommission}`);
+          hasChanges = true;
+          return { ...option, agentCommission: currentCommission };
+        }
+        // אחרת - האופציה שונתה ידנית, לא נדרוס
+        console.log(`⏭️ מדלג על אופציה ${option.id} (שונתה ידנית ל-${option.agentCommission})`);
+        return option;
+      });
+      
+      // עדכן רק אם באמת יש שינויים
+      if (hasChanges) {
+        onUpdate({ ...quoteData, options: updatedOptions });
+      }
+      prevAgentCommissionRef.current = currentCommission;
+    }
+  }, [quoteData?.agentCommission]);
+  
   // חישוב מע"מ אוטומטי כש-budgetPerPackage משתנה
   useEffect(() => {
     if (quoteData && quoteData.budgetPerPackage && quoteData.budgetPerPackage > 0) {
