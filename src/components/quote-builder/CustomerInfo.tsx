@@ -11,7 +11,15 @@ interface CustomerInfoProps {
 
 export function CustomerInfo({ quoteData, onUpdate }: CustomerInfoProps) {
   // שמור את הערך הקודם של עמלת הסוכן
-  const prevAgentCommissionRef = useRef<number | undefined>(quoteData?.agentCommission);
+  const prevAgentCommissionRef = useRef<number | undefined>(undefined);
+  
+  // אתחל את ה-ref בפעם הראשונה
+  useEffect(() => {
+    if (quoteData && prevAgentCommissionRef.current === undefined) {
+      prevAgentCommissionRef.current = quoteData.agentCommission || 0;
+      console.log('🆕 איתחול עמלת סוכן התחלתית:', prevAgentCommissionRef.current);
+    }
+  }, [quoteData]);
   
   // חישוב מע"מ אוטומטי כש-budgetPerPackage משתנה
   useEffect(() => {
@@ -34,23 +42,32 @@ export function CustomerInfo({ quoteData, onUpdate }: CustomerInfoProps) {
   const updateField = (field: keyof QuoteData, value: any) => {
     // אם מעדכנים עמלת סוכן - עדכן גם באופציות
     if (field === 'agentCommission') {
-      const newCommission = typeof value === 'number' ? value : 0;
-      const oldCommission = quoteData.agentCommission || 0;
+      const newCommission = typeof value === 'number' ? value : (parseFloat(value) || 0);
+      const oldCommission = prevAgentCommissionRef.current ?? 0;
       
-      console.log('🔄 מעדכן עמלת סוכן:', oldCommission, '→', newCommission);
+      console.log('='.repeat(50));
+      console.log('🔄 מעדכן עמלת סוכן');
+      console.log('ערך קודם:', oldCommission);
+      console.log('ערך חדש:', newCommission);
+      console.log('מספר אופציות:', quoteData.options.length);
       
       // עדכן את כל האופציות שעדיין משתמשות בערך הקודם
       const updatedOptions = quoteData.options.map(option => {
+        const optionCommission = option.agentCommission ?? 0;
+        console.log(`אופציה ${option.id}: עמלה נוכחית = ${optionCommission}`);
+        
         // אם האופציה משתמשת בערך הקודם (לא שונתה ידנית)
-        if ((option.agentCommission || 0) === oldCommission) {
-          console.log(`✅ מעדכן אופציה ${option.id}:`, oldCommission, '→', newCommission);
+        if (optionCommission === oldCommission) {
+          console.log(`  ✅ מעדכן מ-${optionCommission} ל-${newCommission}`);
           return { ...option, agentCommission: newCommission };
         }
-        console.log(`⏭️ מדלג על אופציה ${option.id} (שונתה ל-${option.agentCommission})`);
+        console.log(`  ⏭️ מדלג (שונתה ידנית)`);
         return option;
       });
       
-      onUpdate({ ...quoteData, [field]: value, options: updatedOptions });
+      console.log('='.repeat(50));
+      
+      onUpdate({ ...quoteData, [field]: newCommission, options: updatedOptions });
       prevAgentCommissionRef.current = newCommission;
     } else {
       onUpdate({ ...quoteData, [field]: value });
