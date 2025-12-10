@@ -25,6 +25,7 @@ interface QuoteOptionCardProps {
   onDuplicate: (optionId: string) => void;
   showDeleteButton: boolean;
   isIrrelevant?: boolean;
+  isReviewMode?: boolean;
 }
 
 export function QuoteOptionCard({
@@ -34,7 +35,8 @@ export function QuoteOptionCard({
   onDelete,
   onDuplicate,
   showDeleteButton,
-  isIrrelevant = false
+  isIrrelevant = false,
+  isReviewMode = false
 }: QuoteOptionCardProps) {
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [dragOverItem, setDragOverItem] = useState<string | null>(null);
@@ -849,6 +851,31 @@ export function QuoteOptionCard({
                     </span>
                   </div>
                 </div>
+              </div>
+            )}
+            
+            {/* חידודי לקוח לאופציה */}
+            {(option.optionComments || isReviewMode) && (
+              <div className="mt-6 bg-purple-50 border-r-4 border-indigo-600 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-indigo-700 font-semibold">💬 חידודי לקוח לאופציה</span>
+                  {!isReviewMode && option.optionComments && (
+                    <span className="text-sm text-gray-500">(מבתאל)</span>
+                  )}
+                </div>
+                {isReviewMode ? (
+                  <textarea
+                    value={option.optionComments || ''}
+                    onChange={(e) => onUpdate(option.id, { ...option, optionComments: e.target.value })}
+                    placeholder="הזיני כאן הערות וחידודים לאופציה זו..."
+                    className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    rows={3}
+                  />
+                ) : (
+                  <p className="text-gray-800 whitespace-pre-wrap">
+                    {option.optionComments}
+                  </p>
+                )}
               </div>
             )}
           </div>

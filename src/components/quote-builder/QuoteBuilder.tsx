@@ -7,6 +7,7 @@ import { CustomerInfo } from './CustomerInfo';
 import { QuoteOptions } from './QuoteOptions';
 import { ProductSidebar } from './ProductSidebar';
 import { QuoteActions } from './QuoteActions';
+import { QuoteComments } from './QuoteComments';
 
 interface QuoteBuilderProps {
   quoteId?: string;
@@ -15,6 +16,7 @@ interface QuoteBuilderProps {
     quoteId?: string;
     quoteNumber?: string;
     profitUnit?: string;
+    mode?: string;  // 'review' לבתאל, רגיל לענת
   };
 }
 
@@ -22,6 +24,9 @@ export function QuoteBuilder({ quoteId, searchParams }: QuoteBuilderProps) {
   const [loadingError, setLoadingError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>('מאתחל...');
   const hasLoadedRef = useRef(false);
+  
+  // בדוק אם זה מצב review
+  const isReviewMode = searchParams?.mode === 'review';
   
   const {
     quoteData,
@@ -152,6 +157,96 @@ export function QuoteBuilder({ quoteId, searchParams }: QuoteBuilderProps) {
     }
   }, [quoteData, saveQuoteToAirtable]);
 
+  // שלח לבתאל לחידודים
+  const handleSendToReview = useCallback(async () => {
+    if (!quoteData?.id) {
+      alert('❌ אין Record ID. אנא שמור את ההצעה קודם.');
+      return;
+    }
+
+    try {
+      // שמור קודם
+      await saveQuoteToAirtable();
+      
+      // עדכן סטטוס ל"לאישור בתאל"
+      const response = await fetch('/api/update-quote-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quoteId: quoteData.id,
+          status: 'לאישור בתאל'
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to update status');
+      
+      alert('✅ ההצעה נשלחה לבתאל לחידודים!');
+    } catch (error) {
+      console.error('❌ שגיאה:', error);
+      alert('❌ שגיאה בשליחה לבתאל.');
+    }
+  }, [quoteData, saveQuoteToAirtable]);
+
+  // אושר ע"י בתאל
+  const handleApprove = useCallback(async () => {
+    if (!quoteData?.id) {
+      alert('❌ אין Record ID.');
+      return;
+    }
+
+    try {
+      // שמור קודם
+      await saveQuoteToAirtable();
+      
+      // עדכן סטטוס ל"מאושר בתאל"
+      const response = await fetch('/api/update-quote-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quoteId: quoteData.id,
+          status: 'מאושר בתאל'
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to update status');
+      
+      alert('✅ ההצעה אושרה בהצלחה!');
+    } catch (error) {
+      console.error('❌ שגיאה:', error);
+      alert('❌ שגיאה באישור.');
+    }
+  }, [quoteData, saveQuoteToAirtable]);
+
+  // שלח לתיקון חוזר
+  const handleRequestChanges = useCallback(async () => {
+    if (!quoteData?.id) {
+      alert('❌ אין Record ID.');
+      return;
+    }
+
+    try {
+      // שמור קודם
+      await saveQuoteToAirtable();
+      
+      // עדכן סטטוס ל"ממתין לתיקון לאחר הערות בתאל"
+      const response = await fetch('/api/update-quote-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quoteId: quoteData.id,
+          status: 'ממתין לתיקון לאחר הערות בתאל'
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to update status');
+      
+      alert('✅ ההצעה נשלחה לתיקון חוזר!');
+    } catch (error) {
+      console.error('❌ שגיאה:', error);
+      alert('❌ שגיאה בשליחה לתיקון.');
+    }
+  }, [quoteData, saveQuoteToAirtable]);
+
   const handleUpdateOption = useCallback((optionId: string, updatedOption: any) => {
     updateOption(optionId, updatedOption);
     if (quoteData?.options) {
@@ -272,13 +367,24 @@ export function QuoteBuilder({ quoteId, searchParams }: QuoteBuilderProps) {
             quoteData={quoteData}
             onSave={handleSave}
             onSend={handleSend}
+            onSendToReview={handleSendToReview}
+            onApprove={handleApprove}
+            onRequestChanges={handleRequestChanges}
             onUndo={handleUndo}
             onRedo={handleRedo}
             canUndo={canUndo}
             canRedo={canRedo}
             isSaving={isSaving}
+            isReviewMode={isReviewMode}
           />
         </div>
+
+        {/* חידודי לקוח להצעה */}
+        <QuoteComments
+          quoteData={quoteData}
+          isReviewMode={isReviewMode}
+          onUpdate={handleCustomerInfoUpdate}
+        />
 
         {/* Main content: Sidebar + Quote Options */}
         <div className="grid grid-cols-[250px_1fr] gap-12">
@@ -294,6 +400,7 @@ export function QuoteBuilder({ quoteId, searchParams }: QuoteBuilderProps) {
             onAddOption={handleAddOption}
             onDeleteOption={handleDeleteOption}
             onDuplicateOption={handleDuplicateOption}
+            isReviewMode={isReviewMode}
           />
         </div>
       </div>

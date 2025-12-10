@@ -167,6 +167,9 @@ export async function GET(request: NextRequest) {
       // סטטוס
       status: fields['סטאטוס'] || '',
       
+      // חידודי לקוח
+      quoteComments: fields['חידודי לקוח להצעה'] || '',
+      
       // הזדמנות מכירה
       opportunityId: fields['הזדמנויות מכירה']?.[0] || undefined,
       occasion: opportunityData?.['מועד'] || [],
@@ -301,6 +304,9 @@ async function buildOptions(optionsData: any[]) {
         // סטטוס
         status: safeString(option['סטאטוס']),
         internalStatus: safeString(option['סטטוס פנימי']),
+        
+        // חידודי לקוח
+        optionComments: safeString(option['חידודי לקוח לאופציה']),
         
         // UI
         isCollapsed: false,

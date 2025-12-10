@@ -13,6 +13,7 @@ interface QuoteOptionsProps {
   onAddOption: () => void;
   onDeleteOption: (optionId: string) => void;
   onDuplicateOption: (optionId: string) => void;
+  isReviewMode?: boolean;
 }
 
 export function QuoteOptions({ 
@@ -21,7 +22,8 @@ export function QuoteOptions({
   onUpdateOption,
   onAddOption,
   onDeleteOption,
-  onDuplicateOption 
+  onDuplicateOption,
+  isReviewMode = false
 }: QuoteOptionsProps) {
   if (!quoteData || !quoteData.options) {
     return (
@@ -77,6 +79,7 @@ export function QuoteOptions({
             onDelete={onDeleteOption}
             onDuplicate={onDuplicateOption}
             showDeleteButton={quoteData.options.length > 1}
+            isReviewMode={isReviewMode}
           />
         ))}
 
@@ -110,6 +113,7 @@ export function QuoteOptions({
                 onDuplicate={onDuplicateOption}
                 showDeleteButton={quoteData.options.length > 1}
                 isIrrelevant={true}
+                isReviewMode={isReviewMode}
               />
             ))}
           </div>

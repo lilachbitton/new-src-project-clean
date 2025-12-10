@@ -135,6 +135,9 @@ export async function POST(request: NextRequest) {
         if (option.shippingPriceToClient !== undefined) fields['תמחור משלוח ללקוח CLAUDE'] = option.shippingPriceToClient;
         if (option.finalDeliveryBoxes !== undefined) fields['כמות קרטונים סופית להובלה'] = String(option.finalDeliveryBoxes);
         if (option.deliveryBreakdown) fields['פירוט החלוקה'] = option.deliveryBreakdown;
+        
+        // חידודי לקוח לאופציה
+        if (option.optionComments !== undefined) fields['חידודי לקוח לאופציה'] = option.optionComments || '';
 
         // קביעת סטטוס
         if (option.status) {
@@ -217,6 +220,9 @@ export async function POST(request: NextRequest) {
         if (option.shippingPriceToClient !== undefined) fields['תמחור משלוח ללקוח CLAUDE'] = option.shippingPriceToClient;
         if (option.finalDeliveryBoxes !== undefined) fields['כמות קרטונים סופית להובלה'] = String(option.finalDeliveryBoxes);
         if (option.deliveryBreakdown) fields['פירוט החלוקה'] = option.deliveryBreakdown;
+        
+        // חידודי לקוח לאופציה
+        if (option.optionComments !== undefined) fields['חידודי לקוח לאופציה'] = option.optionComments || '';
 
         // קביעת סטטוס
         if (option.status) {
@@ -297,12 +303,21 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 4. עדכן רשימת אופציות בהצעת מחיר
+    // 4. עדכן רשימת אופציות וחידודי לקוח בהצעת מחיר
+    const quoteFields: any = {};
     if (optionIds.length) {
+      quoteFields['אופציות להצעת מחיר 4'] = optionIds;
+    }
+    if (quoteData.quoteComments !== undefined) {
+      quoteFields['חידודי לקוח להצעה'] = quoteData.quoteComments || '';
+      console.log('📝 שומר חידודי לקוח להצעה');
+    }
+    
+    if (Object.keys(quoteFields).length > 0) {
       await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${QUOTES_TABLE}/${quoteRecordId}`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fields: { 'אופציות להצעת מחיר 4': optionIds } }),
+        body: JSON.stringify({ fields: quoteFields }),
       });
     }
 

@@ -62,6 +62,9 @@ export interface QuoteOption {
   internalStatus?: string;
   isSelected?: boolean; // אופציה נבחרת
   
+  // Comments from reviewer
+  optionComments?: string; // חידודי לקוח לאופציה - fldLI1FNqKuQhZynP
+  
   // UI state
   isCollapsed?: boolean;
   isIrrelevant?: boolean;
@@ -110,6 +113,9 @@ export interface QuoteData {
   
   // Status
   status?: string;
+  
+  // Comments from reviewer
+  quoteComments?: string; // חידודי לקוח להצעה - fldof9wwajUBJMwrF
   
   // Opportunity
   opportunityId?: string | undefined;
