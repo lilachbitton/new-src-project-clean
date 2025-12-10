@@ -129,8 +129,16 @@ export function QuoteBuilder({ quoteId, searchParams }: QuoteBuilderProps) {
   }, [saveQuoteToAirtable]);
 
   const handleSend = useCallback(() => {
-    console.log('Sending quote:', quoteData);
-    alert('הצעת המחיר נשלחה!');
+    if (!quoteData?.quoteNumber) {
+      alert('❌ אין מספר הצעה. אנא שמור את ההצעה קודם.');
+      return;
+    }
+    
+    const quoteUrl = `https://stqouetsender.vercel.app/api/create-quote-link?quoteNumber=${quoteData.quoteNumber}`;
+    console.log('📨 פותח הצעת מחיר:', quoteUrl);
+    
+    // פתח בטאב חדש
+    window.open(quoteUrl, '_blank');
   }, [quoteData]);
 
   const handleUpdateOption = useCallback((optionId: string, updatedOption: any) => {
