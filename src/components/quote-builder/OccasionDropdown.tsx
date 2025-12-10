@@ -66,11 +66,14 @@ export function OccasionDropdown({ value, onChange }: OccasionDropdownProps) {
 
   const getSelectedLabels = () => {
     if (value.length === 0) return 'בחר מועדים';
-    if (value.length === 1) {
-      const option = OCCASIONS.find(o => o.value === value[0]);
-      return option?.label || '';
-    }
-    return `${value.length} מועדים נבחרו`;
+    
+    // הצג את כל המועדים שנבחרו
+    const selectedLabels = value
+      .map(v => OCCASIONS.find(o => o.value === v)?.label)
+      .filter(Boolean)
+      .join(', ');
+    
+    return selectedLabels || 'בחר מועדים';
   };
 
   return (
