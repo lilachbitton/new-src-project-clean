@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
         if (option.deliveryCompany) fields['חברת משלוחים CLAUDE'] = option.deliveryCompany;
         if (option.projectPriceBeforeVAT !== undefined) fields['תמחור לפרויקט לפני מע"מ CLAUDE'] = option.projectPriceBeforeVAT;
         if (option.shippingPriceToClient !== undefined) fields['תמחור משלוח ללקוח CLAUDE'] = option.shippingPriceToClient;
-        if (option.finalDeliveryBoxes !== undefined) fields['כמות קרטונים סופית להובלה'] = option.finalDeliveryBoxes;
+        if (option.finalDeliveryBoxes !== undefined) fields['כמות קרטונים סופית להובלה'] = String(option.finalDeliveryBoxes);
         if (option.deliveryBreakdown) fields['פירוט החלוקה'] = option.deliveryBreakdown;
 
         // קביעת סטטוס
@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
         if (option.deliveryCompany) fields['חברת משלוחים CLAUDE'] = option.deliveryCompany;
         if (option.projectPriceBeforeVAT !== undefined) fields['תמחור לפרויקט לפני מע"מ CLAUDE'] = option.projectPriceBeforeVAT;
         if (option.shippingPriceToClient !== undefined) fields['תמחור משלוח ללקוח CLAUDE'] = option.shippingPriceToClient;
-        if (option.finalDeliveryBoxes !== undefined) fields['כמות קרטונים סופית להובלה'] = option.finalDeliveryBoxes;
+        if (option.finalDeliveryBoxes !== undefined) fields['כמות קרטונים סופית להובלה'] = String(option.finalDeliveryBoxes);
         if (option.deliveryBreakdown) fields['פירוט החלוקה'] = option.deliveryBreakdown;
 
         // קביעת סטטוס

@@ -131,38 +131,41 @@ export function CustomerInfo({ quoteData, onUpdate }: CustomerInfoProps) {
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">מועד</label>
-            <select
-              multiple
-              value={quoteData.occasion || []}
-              onChange={(e) => {
-                const selectedOptions = Array.from(e.target.selectedOptions).map(opt => opt.value);
-                updateField('occasion', selectedOptions);
-              }}
-              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md"
-              style={{ minHeight: '80px' }}
-            >
-              <option value="rec5P6ExjDoGomtxw">סוף שנת הלימודים</option>
-              <option value="rec9FyBJbUkWfKsIL">סוכות</option>
-              <option value="rec9xYom2liLvST0m">שוטף</option>
-              <option value="recAJxckkXRiwuUyY">להשלים</option>
-              <option value="recBaMFk2hGaCSZye">סוכות </option>
-              <option value="recFVAZykn7FW3XPJ">כנסים</option>
-              <option value="recJ6M8IOXIum92kw">קיץ</option>
-              <option value="recLfm8AIVEIYnyfn">יום האישה</option>
-              <option value="recNYh9ed83Egeo65">חנוכה </option>
-              <option value="recNmz8NAS7IuPpXO">יום העצמאות </option>
-              <option value="recO7SzRs1SKMbNBC">פורים</option>
-              <option value="recR8jumCdC9ZkrUi">סוף שנה 24</option>
-              <option value="recULNDIjkufHCuJL">יום המשפחה</option>
-              <option value="recaDgauTOXn7w4Nx">פסח</option>
-              <option value="recc7U8R7tpBIZx9X">טו בשבט</option>
-              <option value="recgHIav37gXXBUhJ">כללי</option>
-              <option value="recni31KFrnvRPji9">2025</option>
-              <option value="recr1ngO8tEBIZ7K8">שבועות</option>
-              <option value="rectWsASB9PY6fyEq">ראש השנה</option>
-              <option value="recyj6WanHD0SDC89">חורף</option>
-            </select>
-            <div className="text-xs text-gray-500 mt-1">לחץ Ctrl (או Cmd במק) לבחירת מספר מועדים</div>
+            <div className="relative">
+              <select
+                multiple
+                value={quoteData.occasion || []}
+                onChange={(e) => {
+                  const selectedOptions = Array.from(e.target.selectedOptions).map(opt => opt.value);
+                  updateField('occasion', selectedOptions);
+                }}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                size={5}
+              >
+                <option value="rectWsASB9PY6fyEq">ראש השנה</option>
+                <option value="recO7SzRs1SKMbNBC">פורים</option>
+                <option value="recaDgauTOXn7w4Nx">פסח</option>
+                <option value="recNYh9ed83Egeo65">חנוכה</option>
+                <option value="rec9FyBJbUkWfKsIL">סוכות</option>
+                <option value="recr1ngO8tEBIZ7K8">שבועות</option>
+                <option value="recc7U8R7tpBIZx9X">טו בשבט</option>
+                <option value="recNmz8NAS7IuPpXO">יום העצמאות</option>
+                <option value="recLfm8AIVEIYnyfn">יום האישה</option>
+                <option value="recULNDIjkufHCuJL">יום המשפחה</option>
+                <option value="rec5P6ExjDoGomtxw">סוף שנת הלימודים</option>
+                <option value="recR8jumCdC9ZkrUi">סוף שנה 24</option>
+                <option value="recyj6WanHD0SDC89">חורף</option>
+                <option value="recJ6M8IOXIum92kw">קיץ</option>
+                <option value="recFVAZykn7FW3XPJ">כנסים</option>
+                <option value="rec9xYom2liLvST0m">שוטף</option>
+                <option value="recni31KFrnvRPji9">2025</option>
+                <option value="recgHIav37gXXBUhJ">כללי</option>
+                <option value="recAJxckkXRiwuUyY">להשלים</option>
+              </select>
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              לחץ Ctrl (או Cmd במק) + קליק לבחירת מספר מועדים
+            </div>
           </div>
         </div>
       </div>

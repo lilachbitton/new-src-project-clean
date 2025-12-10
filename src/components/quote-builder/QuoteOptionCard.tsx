@@ -505,10 +505,19 @@ export function QuoteOptionCard({
               className="px-3 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">בחר סטטוס</option>
+              <option value="מחכה לבניית אופציה">מחכה לבניית אופציה</option>
               <option value="אופציה בעבודה">אופציה בעבודה</option>
               <option value="אופציה מאושרת לשליחה">אופציה מאושרת לשליחה</option>
-              <option value="אופציה נבחרת להזמנה">אופציה נבחרת להזמנה</option>
+              <option value="נשלחה הצעה ללקוח">נשלחה הצעה ללקוח</option>
+              <option value="לאישור בתאל">לאישור בתאל</option>
+              <option value="מאושר בתאל">מאושר בתאל</option>
               <option value="אופציה לא רלוונטית">אופציה לא רלוונטית</option>
+              <option value="כיוון חיובי">כיוון חיובי</option>
+              <option value="לקראת סגירה">לקראת סגירה</option>
+              <option value="בתיקון">בתיקון</option>
+              <option value="אופציה אושרה ע״י הלקוח">אופציה אושרה ע"י הלקוח</option>
+              <option value="אופציה לאחר תיקון">אופציה לאחר תיקון</option>
+              <option value="הצעה בהולד">הצעה בהולד</option>
             </select>
           </div>
         </div>
