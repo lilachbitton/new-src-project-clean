@@ -13,101 +13,115 @@ export function useQuoteData(initialData?: QuoteData | null) {
   }, []);
 
   const updateCustomerField = useCallback((field: keyof QuoteData, value: any) => {
-    if (!quoteData) return;
-    
-    setQuoteData(prev => prev ? {
-      ...prev,
-      [field]: value
-    } : null);
-  }, [quoteData]);
+    setQuoteData(prev => {
+      if (!prev) return null;
+      
+      return {
+        ...prev,
+        [field]: value
+      };
+    });
+  }, []);
 
   const updateBudgetBeforeVAT = useCallback((value: number | undefined) => {
-    if (!quoteData) return;
-    
-    const withVAT = value ? parseFloat((value * 1.18).toFixed(2)) : undefined;
-    setQuoteData(prev => prev ? {
-      ...prev,
-      budgetBeforeVAT: value,
-      budgetWithVAT: withVAT
-    } : null);
-  }, [quoteData]);
+    setQuoteData(prev => {
+      if (!prev) return null;
+      
+      const withVAT = value ? parseFloat((value * 1.18).toFixed(2)) : undefined;
+      return {
+        ...prev,
+        budgetBeforeVAT: value,
+        budgetWithVAT: withVAT
+      };
+    });
+  }, []);
 
   const updateBudgetWithVAT = useCallback((value: number | undefined) => {
-    if (!quoteData) return;
-    
-    const beforeVAT = value ? parseFloat((value / 1.18).toFixed(2)) : undefined;
-    setQuoteData(prev => prev ? {
-      ...prev,
-      budgetWithVAT: value,
-      budgetBeforeVAT: beforeVAT
-    } : null);
-  }, [quoteData]);
+    setQuoteData(prev => {
+      if (!prev) return null;
+      
+      const beforeVAT = value ? parseFloat((value / 1.18).toFixed(2)) : undefined;
+      return {
+        ...prev,
+        budgetWithVAT: value,
+        budgetBeforeVAT: beforeVAT
+      };
+    });
+  }, []);
 
   const addOption = useCallback(() => {
-    if (!quoteData) return;
-    
-    const newOption: QuoteOption = {
-      id: String.fromCharCode(65 + quoteData.options.length), // A, B, C...
-      title: `אופציה ${quoteData.options.length + 1}`,
-      items: [],
-      total: 0,
-      additionalExpenses: 16, // ברירת מחדל 16 ש"ח
-      agentCommission: quoteData.agentCommission || 0, // העמלה מההזדמנות
-      isCollapsed: false,
-      isIrrelevant: false,
-    };
+    setQuoteData(prev => {
+      if (!prev) return null;
+      
+      const newOption: QuoteOption = {
+        id: String.fromCharCode(65 + prev.options.length), // A, B, C...
+        title: `אופציה ${prev.options.length + 1}`,
+        items: [],
+        total: 0,
+        additionalExpenses: 16, // ברירת מחדל 16 ש"ח
+        agentCommission: prev.agentCommission || 0, // העמלה מההזדמנות
+        isCollapsed: false,
+        isIrrelevant: false,
+      };
 
-    setQuoteData(prev => prev ? {
-      ...prev,
-      options: [...prev.options, newOption]
-    } : null);
-  }, [quoteData]);
+      return {
+        ...prev,
+        options: [...prev.options, newOption]
+      };
+    });
+  }, []);
 
   const updateOption = useCallback((optionId: string, updatedOption: QuoteOption) => {
-    if (!quoteData) return;
-    
-    setQuoteData(prev => prev ? {
-      ...prev,
-      options: prev.options.map(option =>
-        option.id === optionId ? updatedOption : option
-      )
-    } : null);
-  }, [quoteData]);
+    setQuoteData(prev => {
+      if (!prev) return null;
+      
+      return {
+        ...prev,
+        options: prev.options.map(option =>
+          option.id === optionId ? { ...updatedOption } : option
+        )
+      };
+    });
+  }, []);
 
   const deleteOption = useCallback((optionId: string) => {
-    if (!quoteData || quoteData.options.length <= 1) return;
-    
-    setQuoteData(prev => prev ? {
-      ...prev,
-      options: prev.options.filter(option => option.id !== optionId)
-    } : null);
-  }, [quoteData]);
+    setQuoteData(prev => {
+      if (!prev || prev.options.length <= 1) return prev;
+      
+      return {
+        ...prev,
+        options: prev.options.filter(option => option.id !== optionId)
+      };
+    });
+  }, []);
 
   const duplicateOption = useCallback((optionId: string) => {
-    if (!quoteData) return;
-    
-    const optionToDuplicate = quoteData.options.find(opt => opt.id === optionId);
-    if (!optionToDuplicate) return;
+    setQuoteData(prev => {
+      if (!prev) return null;
+      
+      const optionToDuplicate = prev.options.find(opt => opt.id === optionId);
+      if (!optionToDuplicate) return prev;
 
-    const newOption: QuoteOption = {
-      ...optionToDuplicate,
-      id: String.fromCharCode(65 + quoteData.options.length),
-      airtableId: undefined, // אל תשכפל את airtableId
-      title: `${optionToDuplicate.title} (עותק)`,
-      items: optionToDuplicate.items.map(item => ({
-        ...item,
-        // שמור על ID המקורי של המוצרים מאיירטייבל
-      })),
-      packageNumber: optionToDuplicate.packageNumber, // שמור מספר מארז
-      image: optionToDuplicate.image, // שכפל גם את התמונה
-      isCollapsed: false,
-    };
+      const newOption: QuoteOption = {
+        ...optionToDuplicate,
+        id: String.fromCharCode(65 + prev.options.length),
+        airtableId: undefined, // אל תשכפל את airtableId
+        title: `${optionToDuplicate.title} (עותק)`,
+        items: optionToDuplicate.items.map(item => ({
+          ...item,
+          // שמור על ID המקורי של המוצרים מאיירטייבל
+        })),
+        packageNumber: optionToDuplicate.packageNumber, // שמור מספר מארז
+        image: optionToDuplicate.image, // שכפל גם את התמונה
+        isCollapsed: false,
+      };
 
-    setQuoteData(prev => prev ? {
-      ...prev,
-      options: [...prev.options, newOption]
-    } : null);
-  }, [quoteData]);
+      return {
+        ...prev,
+        options: [...prev.options, newOption]
+      };
+    });
+  }, []);
 
   // טעינת הצעת מחיר מאיירטייבל
   const loadQuoteFromAirtable = useCallback(async (quoteId: string) => {
@@ -136,63 +150,69 @@ export function useQuoteData(initialData?: QuoteData | null) {
 
   // שמירת הצעת מחיר לאיירטייבל
   const saveQuoteToAirtable = useCallback(async () => {
-    if (!quoteData) {
-      console.warn('אין נתוני הצעת מחיר לשמירה');
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      console.log('💾 שומר הצעת מחיר לאיירטייבל:', quoteData.quoteNumber);
-      
-      const response = await fetch('/api/save-quote-to-airtable', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(quoteData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.details || 'Failed to save quote to Airtable');
+    // קבל את ה-quoteData הנוכחי מה-state
+    setQuoteData(currentData => {
+      if (!currentData) {
+        console.warn('אין נתוני הצעת מחיר לשמירה');
+        return currentData;
       }
 
-      const result = await response.json();
-      console.log('✅ הצעת מחיר נשמרה בהצלחה:', result);
-      
-      // עדכן את ה-Record ID וה-Option IDs אחרי שמירה מוצלחת (אבל שמור את התמונות)
-      if (result.quoteRecordId) {
-        setQuoteData(prev => {
-          if (!prev) return null;
+      // התחל שמירה ב-async
+      (async () => {
+        setIsSaving(true);
+        try {
+          console.log('💾 שומר הצעת מחיר לאיירטייבל:', currentData.quoteNumber);
           
-          // עדכן גם את ה-airtableId של כל אופציה
-          const updatedOptions = prev.options.map((option, index) => {
-            if (result.optionIds && result.optionIds[index]) {
-              return {
-                ...option,
-                airtableId: result.optionIds[index]
-              };
-            }
-            return option;
+          const response = await fetch('/api/save-quote-to-airtable', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(currentData),
           });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.details || 'Failed to save quote to Airtable');
+          }
+
+          const result = await response.json();
+          console.log('✅ הצעת מחיר נשמרה בהצלחה:', result);
           
-          return {
-            ...prev,
-            id: result.quoteRecordId,
-            options: updatedOptions
-          };
-        });
-      }
-      
-      return result;
-    } catch (error) {
-      console.error('❌ שגיאה בשמירת הצעת מחיר:', error);
-      throw error;
-    } finally {
-      setIsSaving(false);
-    }
-  }, [quoteData]);
+          // עדכן את ה-Record ID וה-Option IDs אחרי שמירה מוצלחת
+          if (result.quoteRecordId) {
+            setQuoteData(prev => {
+              if (!prev) return null;
+              
+              // עדכן גם את ה-airtableId של כל אופציה
+              const updatedOptions = prev.options.map((option, index) => {
+                if (result.optionIds && result.optionIds[index]) {
+                  return {
+                    ...option,
+                    airtableId: result.optionIds[index]
+                  };
+                }
+                return option;
+              });
+              
+              return {
+                ...prev,
+                id: result.quoteRecordId,
+                options: updatedOptions
+              };
+            });
+          }
+        } catch (error) {
+          console.error('❌ שגיאה בשמירת הצעת מחיר:', error);
+          throw error;
+        } finally {
+          setIsSaving(false);
+        }
+      })();
+
+      return currentData;
+    });
+  }, []);
 
   // Initialize with default data if none provided
   const initializeQuoteData = useCallback((recordId?: string, quoteNumber?: string) => {
