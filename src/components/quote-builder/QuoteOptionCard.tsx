@@ -53,21 +53,7 @@ export function QuoteOptionCard({
     onUpdate(option.id, { ...option, isCollapsed: !option.isCollapsed });
   };
 
-  const handleToggleIrrelevant = () => {
-    const newIrrelevant = !option.isIrrelevant;
-    onUpdate(option.id, { 
-      ...option, 
-      isIrrelevant: newIrrelevant,
-      isCollapsed: newIrrelevant ? true : option.isCollapsed 
-    });
-  };
 
-  const handleToggleSelected = () => {
-    onUpdate(option.id, { 
-      ...option, 
-      isSelected: !option.isSelected
-    });
-  };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -511,25 +497,20 @@ export function QuoteOptionCard({
             />
           </Button>
           
-          <label className="flex items-center gap-1">
-            <input
-              type="checkbox"
-              checked={option.isIrrelevant || false}
-              onChange={handleToggleIrrelevant}
-              className="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300"
-            />
-            <span className="text-sm">לא רלוונטי</span>
-          </label>
-          
-          <label className="flex items-center gap-1 mr-2">
-            <input
-              type="checkbox"
-              checked={option.isSelected || false}
-              onChange={handleToggleSelected}
-              className="form-checkbox h-4 w-4 text-green-600 rounded border-gray-300"
-            />
-            <span className="text-sm text-green-700 font-semibold">אופציה נבחרת ✓</span>
-          </label>
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-600">סטטוס:</label>
+            <select
+              value={option.status || ''}
+              onChange={(e) => onUpdate(option.id, { ...option, status: e.target.value })}
+              className="px-3 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">בחר סטטוס</option>
+              <option value="אופציה בעבודה">אופציה בעבודה</option>
+              <option value="אופציה מאושרת לשליחה">אופציה מאושרת לשליחה</option>
+              <option value="אופציה נבחרת להזמנה">אופציה נבחרת להזמנה</option>
+              <option value="אופציה לא רלוונטית">אופציה לא רלוונטית</option>
+            </select>
+          </div>
         </div>
         
         <Input

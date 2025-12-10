@@ -136,11 +136,15 @@ export function ShippingSection({ option, onUpdate }: ShippingSectionProps) {
                 />
               </div>
               
-              <div className="bg-white p-3 rounded border border-blue-200">
-                <div className="text-xs text-gray-600 mb-1">פירוט החלוקה:</div>
-                <div className="text-sm font-semibold text-blue-900">
-                  {option.deliveryBreakdown || 'אין מידע'}
-                </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">פירוט החלוקה (ניתן לעריכה)</label>
+                <textarea
+                  value={option.deliveryBreakdown || ""}
+                  onChange={(e) => onUpdate(option.id, { ...option, deliveryBreakdown: e.target.value })}
+                  placeholder="הזן פירוט החלוקה..."
+                  className="w-full text-sm p-2 border border-blue-300 rounded-md resize-y"
+                  rows={3}
+                />
               </div>
             </div>
           </div>
