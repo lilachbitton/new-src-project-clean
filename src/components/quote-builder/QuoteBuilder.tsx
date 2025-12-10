@@ -128,18 +128,29 @@ export function QuoteBuilder({ quoteId, searchParams }: QuoteBuilderProps) {
     }
   }, [saveQuoteToAirtable]);
 
-  const handleSend = useCallback(() => {
+  const handleSend = useCallback(async () => {
     if (!quoteData?.quoteNumber) {
       alert('❌ אין מספר הצעה. אנא שמור את ההצעה קודם.');
       return;
     }
     
-    const quoteUrl = `https://stqouetsender.vercel.app/api/create-quote-link?quoteNumber=${quoteData.quoteNumber}`;
-    console.log('📨 פותח הצעת מחיר:', quoteUrl);
-    
-    // פתח בטאב חדש
-    window.open(quoteUrl, '_blank');
-  }, [quoteData]);
+    try {
+      // שמור את ההצעה קודם
+      console.log('💾 שומר הצעת מחיר לפני שליחה...');
+      await saveQuoteToAirtable();
+      console.log('✅ הצעת מחיר נשמרה בהצלחה!');
+      
+      // עכשיו פתח את הלינק
+      const quoteUrl = `https://stqouetsender.vercel.app/api/create-quote-link?quoteNumber=${quoteData.quoteNumber}`;
+      console.log('📨 פותח הצעת מחיר:', quoteUrl);
+      
+      // פתח בטאב חדש
+      window.open(quoteUrl, '_blank');
+    } catch (error) {
+      console.error('❌ שגיאה בשמירת הצעת מחיר:', error);
+      alert('❌ שגיאה בשמירת הצעת המחיר. אנא נסה שנית.');
+    }
+  }, [quoteData, saveQuoteToAirtable]);
 
   const handleUpdateOption = useCallback((optionId: string, updatedOption: any) => {
     updateOption(optionId, updatedOption);
