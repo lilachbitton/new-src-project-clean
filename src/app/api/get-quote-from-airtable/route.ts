@@ -8,7 +8,6 @@ const QUOTES_TABLE = 'tbl9d2UhyRrNVjGxW'; // הצעות מחיר ללקוח
 const OPTIONS_TABLE = 'tblkRYwCcYfEG6iAO'; // אופציות להצעת מחיר
 const OPPORTUNITIES_TABLE = 'tbl4fGlUM8KCbCS0R'; // הזדמנויות מכירה
 const PRODUCTS_TABLE = 'tbluPDR4eOtWC8D9J'; // מוצרים
-const OCCASIONS_TABLE = 'tblMdaIGhzy63b51t'; // מועדים וחגים
 
 export async function GET(request: NextRequest) {
   try {
@@ -170,7 +169,7 @@ export async function GET(request: NextRequest) {
       
       // הזדמנות מכירה
       opportunityId: fields['הזדמנויות מכירה']?.[0] || undefined,
-      occasion: opportunityData?.['מועד'] ? await fetchOccasionNames(opportunityData['מועד']) : [],
+      occasion: opportunityData?.['מועד'] || [],
       
       // אופציות
       options: await buildOptions(optionsData),
@@ -300,11 +299,13 @@ async function buildOptions(optionsData: any[]) {
         image: option['תמונת מארז']?.[0]?.url || undefined,
         
         // סטטוס
-        status: safeString(option['סטאטוס']), // טוען את הסטטוס המלא
+        status: safeString(option['סטאטוס']),
         internalStatus: safeString(option['סטטוס פנימי']),
         
         // UI
         isCollapsed: false,
+        isIrrelevant: safeString(option['סטאטוס']) === 'אופציה לא רלוונטית',
+        isSelected: safeString(option['סטאטוס']) === 'אופציה מאושרת לשליחה',
       };
 
       options.push(optionData);
@@ -320,8 +321,8 @@ async function buildOptions(optionsData: any[]) {
       title: 'אופציה 1',
       items: [],
       total: 0,
-      status: 'אופציה בעבודה',
       isCollapsed: false,
+      isIrrelevant: false,
     });
   }
 
@@ -367,40 +368,6 @@ async function fetchProducts(productIds: string[], type: 'product' | 'packaging'
     return products.filter(p => p !== null);
   } catch (error) {
     console.error('❌ Error fetching products:', error);
-    return [];
-  }
-}
-
-// פונקציה למשיכת שמות מועדים
-async function fetchOccasionNames(occasionIds: string[]): Promise<string[]> {
-  if (!occasionIds || occasionIds.length === 0) return [];
-  
-  try {
-    const occasionsPromises = occasionIds.map(async (occasionId: string) => {
-      try {
-        const response = await fetch(
-          `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${OCCASIONS_TABLE}/${occasionId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${AIRTABLE_API_KEY}`,
-            },
-          }
-        );
-        
-        if (response.ok) {
-          const record = await response.json();
-          return record.fields['שם מועד'] || record.fields['שם'] || record.fields['Name'] || '';
-        }
-        return null;
-      } catch (error) {
-        return null;
-      }
-    });
-
-    const occasions = await Promise.all(occasionsPromises);
-    return occasions.filter(o => o !== null) as string[];
-  } catch (error) {
-    console.error('❌ Error fetching occasions:', error);
     return [];
   }
 }

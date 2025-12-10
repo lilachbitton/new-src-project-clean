@@ -58,11 +58,13 @@ export interface QuoteOption {
   projectPriceToClientWithVAT?: number; // fldd84rqvGunQcnrC - תמחור לפרויקט ללקוח כולל מע"מ (formula)
   
   // Status fields
-  status?: string; // סטטוס מלא מאיירטייבל
+  status?: string;
   internalStatus?: string;
+  isSelected?: boolean; // אופציה נבחרת
   
   // UI state
   isCollapsed?: boolean;
+  isIrrelevant?: boolean;
 }
 
 export interface QuoteData {
